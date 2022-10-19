@@ -11,6 +11,7 @@ builder.Services.AddScoped<TryitterContext>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -26,13 +27,9 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+var context = new TryitterContext();
+context.Database.EnsureCreated();
+
 app.Run();
 
-public partial class Program
-{
-    static void Main(string[] args)
-    {
-        var context = new TryitterContext();
-        context.Database.EnsureCreated();
-    }
-}
+public partial class program {}
