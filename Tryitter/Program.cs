@@ -1,4 +1,4 @@
-using tryitter.Repository;
+using Tryitter.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 

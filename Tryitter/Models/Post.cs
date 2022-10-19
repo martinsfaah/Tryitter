@@ -1,4 +1,4 @@
-namespace tryitter.Models
+namespace Tryitter.Models
 {
     public class Post
     {
