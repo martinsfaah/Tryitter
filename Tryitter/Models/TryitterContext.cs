@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using tryitter.Models;
 
-namespace tryitter.Repository
+namespace Tryitter.Models
 {
     public class TryitterContext : DbContext
     {
@@ -10,11 +9,19 @@ namespace tryitter.Repository
 
         public TryitterContext(DbContextOptions<TryitterContext> options) : base(options) { }
         public TryitterContext() { }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer(@"Server=127.0.0.1;Database=Tryitter;User=SA;Password=Password12!;");
+                var connectionString = Environment.GetEnvironmentVariable("DOTNET_CONNECTION_STRING");
+
+                if (connectionString == null)
+                {
+                    throw new InvalidOperationException("Connection string not found");
+                }
+
+                optionsBuilder.UseSqlServer(connectionString);
             }
         }
     }
