@@ -1,4 +1,4 @@
-namespace tryitter.Models
+namespace Tryitter.Models
 {
     public class User
     {
@@ -6,5 +6,6 @@ namespace tryitter.Models
         public string Username { get; set; }
         public string Name { get; set; }
         public string Password { get; set; }
+        public ICollection<Post> Posts { get; }
     }
 }
