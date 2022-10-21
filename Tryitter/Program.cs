@@ -1,12 +1,17 @@
 using Tryitter.Models;
+using Tryitter.Repositories;
+using Tryitter.UseCases;
 
 var builder = WebApplication.CreateBuilder(args);
 
+DotNetEnv.Env.Load();
 // Add services to the container.
 
 builder.Services.AddControllers();
 builder.Services.AddDbContext<TryitterContext>();
 builder.Services.AddScoped<TryitterContext>();
+builder.Services.AddScoped<UserRepository>();
+builder.Services.AddScoped<UserUseCase>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -23,6 +28,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
