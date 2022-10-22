@@ -54,4 +54,19 @@ public class UserController : ControllerBase
     }
   }
 
+  [HttpGet]
+  [AllowAnonymous]
+  public ActionResult<User> GetAll()
+  {
+    try
+    {
+      var users = _userUseCase.GetAll();
+
+      return Ok(users);
+    }
+    catch (Exception exception)
+    {
+      return BadRequest(exception.Message);
+    }
+  }
 }
