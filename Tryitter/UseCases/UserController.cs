@@ -37,4 +37,21 @@ public class UserController : ControllerBase
       return BadRequest(exception.Message);
     }
   }
+
+  [HttpPost]
+  [AllowAnonymous]
+  public ActionResult<User> Create([FromBody] User user)
+  {
+    try
+    {
+      var created = _userUseCase.Create(user);
+
+      return Ok(created);
+    }
+    catch (Exception exception)
+    {
+      return BadRequest(exception.Message);
+    }
+  }
+
 }
