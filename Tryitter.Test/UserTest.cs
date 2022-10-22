@@ -69,4 +69,29 @@ public class UserTest : IClassFixture<WebApplicationFactory<program>>
         }
     };
 
+    [Theory(DisplayName = "GET /User deve retornar uma lista de users")]
+    [MemberData(nameof(ShouldGetAllUsersData))]
+    public async Task ShouldGetAllUsers(List<User> usersExpected)
+    {
+        var response =  await client.GetAsync("/User");
+        var content = await response.Content.ReadAsStringAsync();
+        var result = JsonConvert.DeserializeObject<List<User>>(content);
+        response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+        result.Should().BeEquivalentTo(usersExpected);
+    }
+
+    public static readonly TheoryData<List<User>> ShouldGetAllUsersData = new()
+    {
+        new()
+        {
+            new User 
+            { 
+              UserId = 1,
+              Username = "Test",
+              Name="Test",
+              Password="Test",
+              Email = "Test" 
+            }
+        }
+    };
 }
