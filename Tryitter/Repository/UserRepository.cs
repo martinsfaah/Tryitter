@@ -16,6 +16,12 @@ public class UserRepository
     _context.SaveChanges();
     return user;
   }
+  
+  public List<User> GetAll()
+  {
+    var users = _context.Users.ToList();
+    return users;
+  }
 
   public User? GetByEmail(string Email)
   {
