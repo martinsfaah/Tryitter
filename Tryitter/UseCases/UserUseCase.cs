@@ -29,4 +29,11 @@ public class UserUseCase
 
     return created;
   }
+  
+  public List<User> GetAll()
+  {
+    var users = _repository.GetAll();
+
+    return users;
+  }
 }
