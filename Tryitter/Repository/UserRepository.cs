@@ -10,8 +10,12 @@ public class UserRepository
     _context = context;
   }
 
-  // public User Create(User user)
-  // {}
+  public User Create(User user)
+  {
+    _context.Users.Add(user);
+    _context.SaveChanges();
+    return user;
+  }
 
   public User? GetByEmail(string Email)
   {
