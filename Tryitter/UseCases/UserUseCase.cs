@@ -22,4 +22,11 @@ public class UserUseCase
 
     return token;
   }
+  
+  public User Create(User user)
+  {
+    var created = _repository.Create(user);
+
+    return created;
+  }
 }
