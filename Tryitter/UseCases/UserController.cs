@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 
 
 using Tryitter.UseCases;
-using Tryitter.Models;
 using Tryitter.RequestHandlers;
 namespace Tryitter.Controllers;
 
@@ -19,11 +18,11 @@ public class UserController : ControllerBase
 
   [HttpPost("/auth")]
   [AllowAnonymous]
-  public ActionResult<string> Authenticate([FromBody] AuthenticateRequest user)
+  public async Task<ActionResult<string>> Authenticate([FromBody] AuthenticateRequest user)
   {
     try
     {
-      var token = _userUseCase.Auth(user.Email, user.Password);
+      var token = await _userUseCase.Auth(user.Email, user.Password);
 
       if (token == null)
       { 

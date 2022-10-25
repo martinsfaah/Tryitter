@@ -1,17 +1,16 @@
 using Tryitter.Repositories;
 using Tryitter.Services;
-using Tryitter.Models;
 namespace Tryitter.UseCases;
 public class UserUseCase
 {
-  private UserRepository _repository;
-  public UserUseCase(UserRepository repository)
+  private readonly IUserRepository _repository;
+  public UserUseCase(IUserRepository repository)
   {
     _repository = repository;
   }
-  public string? Auth(string Email, string Password)
+  public async Task<string?> Auth(string Email, string Password)
   {
-    var user = _repository.GetByEmail(Email);
+    var user = await _repository.GetByEmail(Email);
     
     if (user == null || user.Password != Password)
     {

@@ -1,8 +1,10 @@
+using Microsoft.EntityFrameworkCore;
+
 using Tryitter.Models;
 
 namespace Tryitter.Repositories;
 
-public class UserRepository
+public class UserRepository : IUserRepository
 {
   private TryitterContext _context;
   public UserRepository(TryitterContext context)
@@ -13,10 +15,8 @@ public class UserRepository
   // public User Create(User user)
   // {}
 
-  public User? GetByEmail(string Email)
+  public async Task<User?> GetByEmail(string Email)
   {
-    var userFound = _context.Users?.FirstOrDefault(user => user.Email == Email);
-
-    return userFound;
+    return await _context.Users.FirstOrDefaultAsync(user => user.Email == Email);
   }
 }
