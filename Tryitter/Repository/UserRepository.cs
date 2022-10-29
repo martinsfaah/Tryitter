@@ -33,6 +33,14 @@ public class UserRepository
     return user;
   }
 
+  public User Update(User user)
+  {
+    _context.Update(user);
+    _context.SaveChanges();
+
+    return user;
+  }
+  
   public User? GetByEmail(string Email)
   {
     var userFound = _context.Users?.FirstOrDefault(user => user.Email == Email);
