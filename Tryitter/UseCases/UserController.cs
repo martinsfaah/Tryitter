@@ -69,4 +69,28 @@ public class UserController : ControllerBase
       return BadRequest(exception.Message);
     }
   }
+
+  [HttpGet("{id}")]
+  [AllowAnonymous]
+  public ActionResult<User> GetById([FromRoute] string id)
+  {
+    try
+    {
+      int IdNumber = Convert.ToInt32(id);
+      
+      var user = _userUseCase.GetById(IdNumber);
+
+      if (user is null)
+      {
+        return NotFound("User not found");
+      }
+
+      return Ok(user);
+    }
+    catch (Exception exception)
+    {
+      return BadRequest(exception.Message);
+    }
+  }
+
 }
