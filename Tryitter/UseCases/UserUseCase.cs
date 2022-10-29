@@ -63,4 +63,17 @@ public class UserUseCase
     return updated;
   }
 
+  public User? Delete(int id)
+  {
+    var user = _repository.GetById(id);
+
+    if (user is null)
+    {
+      return null;
+    }
+    
+    var deletedUser = _repository.Delete(user);
+
+    return deletedUser;
+  }
 }
