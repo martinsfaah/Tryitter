@@ -50,7 +50,7 @@ public class UserTest : IClassFixture<WebApplicationFactory<program>>
         var response =  await client.PostAsync("/User", body);
         var content = await response.Content.ReadAsStringAsync();
         var result = JsonConvert.DeserializeObject<User>(content);
-        response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+        response.StatusCode.Should().Be(System.Net.HttpStatusCode.Created);
         result.Name.Should().Be(userExpected.Name);
         result.Username.Should().Be(userExpected.Username);
         result.Email.Should().Be(userExpected.Email);

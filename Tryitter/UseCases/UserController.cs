@@ -46,7 +46,7 @@ public class UserController : ControllerBase
     {
       var created = _userUseCase.Create(user);
 
-      return Ok(created);
+      return CreatedAtAction("GetById", new { id = created.UserId }, created);
     }
     catch (Exception exception)
     {
