@@ -36,4 +36,12 @@ public class UserUseCase
 
     return users;
   }
+
+  public User? GetById(int id)
+  {
+    var user = _repository.GetById(id);
+
+    return user;
+  }
+
 }
