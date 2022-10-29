@@ -93,4 +93,27 @@ public class UserController : ControllerBase
     }
   }
 
+  [HttpPut("{id}")]
+  [AllowAnonymous]
+  public ActionResult<User> Update([FromRoute] string id, [FromBody] User newUser)
+  {
+    try
+    {
+      int IdNumber = Convert.ToInt32(id);
+      
+      var user = _userUseCase.Update(IdNumber, newUser);
+
+      if (user is null)
+      {
+        return NotFound("User not found");
+      }
+
+      return Ok(user);
+    }
+    catch (Exception exception)
+    {
+      return BadRequest(exception.Message);
+    }
+  }
+
 }
