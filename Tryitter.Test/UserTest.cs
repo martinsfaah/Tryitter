@@ -127,4 +127,52 @@ public class UserTest : IClassFixture<WebApplicationFactory<program>>
         content.Should().BeEquivalentTo("User not found");
     }
 
+    [Theory(DisplayName = "UPDATE /User/{id} deve retornar um user")]
+    [MemberData(nameof(ShouldUpdateUserData))]
+    public async Task ShouldUpdateUser(User userExpected)
+    {
+        var json = JsonConvert.SerializeObject(userExpected);
+        var body = new StringContent(json, Encoding.UTF8, "application/json"); 
+        var response =  await client.PutAsync("/User/1", body);
+        var content = await response.Content.ReadAsStringAsync();
+        var result = JsonConvert.DeserializeObject<User>(content);
+        response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+        result.Should().BeEquivalentTo(userExpected);
+    }
+
+    public static readonly TheoryData<User> ShouldUpdateUserData = new()
+    {
+        new User 
+        { 
+            UserId = 1,
+            Username = "newTest",
+            Name="newTest",
+            Password="newTest",
+            Email = "newTest" 
+        }
+    };
+
+    [Theory(DisplayName = "UPDATE /User/{id} com id inválido deve retornar not found")]
+    [MemberData(nameof(ShouldUpdateUserInvalidData))]
+    public async Task ShouldUpdateUserInvalid( User userExpected)
+    {
+        var json = JsonConvert.SerializeObject(userExpected);
+        var body = new StringContent(json, Encoding.UTF8, "application/json");
+        var response =  await client.PutAsync("/User/2", body);
+        var content = await response.Content.ReadAsStringAsync();
+        response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+        content.Should().BeEquivalentTo("User not found");
+    }
+    public static readonly TheoryData<User> ShouldUpdateUserInvalidData = new()
+    {
+        new User 
+        { 
+            UserId = 1,
+            Username = "newTest",
+            Name="newTest",
+            Password="newTest",
+            Email = "newTest" 
+        }
+    };
+
 }
