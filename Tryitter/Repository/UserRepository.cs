@@ -26,6 +26,13 @@ public class UserRepository
     return users;
   }
 
+  public User? GetById(int id)
+  {
+    var user = _context.Users.Where(x => x.UserId == id).Include(x => x.Posts).FirstOrDefault();
+
+    return user;
+  }
+
   public User? GetByEmail(string Email)
   {
     var userFound = _context.Users?.FirstOrDefault(user => user.Email == Email);
