@@ -116,4 +116,26 @@ public class UserController : ControllerBase
     }
   }
 
+  [HttpDelete("{id}")]
+  [AllowAnonymous]
+  public ActionResult Delete([FromRoute] string id)
+  {
+    try
+    {
+      int IdNumber = Convert.ToInt32(id);
+      
+      var user = _userUseCase.Delete(IdNumber);
+
+      if (user is null)
+      {
+        return NotFound("User not found");
+      }
+
+      return NoContent();
+    }
+    catch (Exception exception)
+    {
+      return BadRequest(exception.Message);
+    }
+  }
 }
