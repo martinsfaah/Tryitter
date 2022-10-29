@@ -44,4 +44,23 @@ public class UserUseCase
     return user;
   }
 
+  public User? Update(int id, User newUser)
+  {
+    var user = _repository.GetById(id);
+
+    if (user is null)
+    {
+      return null;
+    }
+
+    user.Name = newUser.Name;
+    user.Username = newUser.Username;
+    user.Email = newUser.Email;
+    user.Password = newUser.Password;
+
+    var updated = _repository.Update(user);
+
+    return updated;
+  }
+
 }
