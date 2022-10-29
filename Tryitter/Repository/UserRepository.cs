@@ -1,4 +1,5 @@
 using Tryitter.Models;
+using System.Data.Entity;
 
 namespace Tryitter.Repositories;
 
@@ -14,12 +15,14 @@ public class UserRepository
   {
     _context.Users.Add(user);
     _context.SaveChanges();
+
     return user;
   }
   
   public List<User> GetAll()
   {
-    var users = _context.Users.ToList();
+    var users = _context.Users.Include(x => x.Posts).ToList();
+
     return users;
   }
 
