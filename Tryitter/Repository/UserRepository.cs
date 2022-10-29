@@ -41,6 +41,20 @@ public class UserRepository
     return user;
   }
   
+  public User Delete(User user)
+  {
+    if (user.Posts is not null)
+    {
+      for (int i = 0; i < user.Posts.Count; i++)
+      {
+        _context.Remove(user.Posts.ToList()[i]);
+      }
+    }
+    _context.Remove(user);
+    _context.SaveChanges();
+    return user;
+  }
+
   public User? GetByEmail(string Email)
   {
     var userFound = _context.Users?.FirstOrDefault(user => user.Email == Email);
