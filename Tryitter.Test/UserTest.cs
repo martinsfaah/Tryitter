@@ -94,4 +94,37 @@ public class UserTest : IClassFixture<WebApplicationFactory<program>>
             }
         }
     };
+
+    [Theory(DisplayName = "GET /User/{id} deve retornar um user")]
+    [MemberData(nameof(ShouldGetUserbyIdData))]
+    public async Task ShouldGetUserbyId(User userExpected)
+    {
+        var response =  await client.GetAsync("/User/1");
+        var content = await response.Content.ReadAsStringAsync();
+        var result = JsonConvert.DeserializeObject<User>(content);
+        response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+        result.Should().BeEquivalentTo(userExpected);
+    }
+
+    public static readonly TheoryData<User> ShouldGetUserbyIdData = new()
+    {
+        new User 
+        { 
+            UserId = 1,
+            Username = "Test",
+            Name="Test",
+            Password="Test",
+            Email = "Test" 
+        }
+    };
+
+    [Fact(DisplayName = "GET /User/{id} com id inválido deve retornar not found")]
+    public async Task ShouldGetUserInvalid()
+    {
+        var response =  await client.GetAsync("/User/2");
+        var content = await response.Content.ReadAsStringAsync();
+        response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+        content.Should().BeEquivalentTo("User not found");
+    }
+
 }
