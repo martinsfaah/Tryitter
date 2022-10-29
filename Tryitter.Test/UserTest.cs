@@ -175,4 +175,23 @@ public class UserTest : IClassFixture<WebApplicationFactory<program>>
         }
     };
 
+    [Fact(DisplayName = "DELETE /User/{id} deve apagar um user")]
+    public async Task ShouldDeleteUserbyId()
+    {
+        var resp =  await client.DeleteAsync("/User/1");
+        resp.StatusCode.Should().Be(System.Net.HttpStatusCode.NoContent);
+        var response =  await client.GetAsync("/User/2");
+        var content = await response.Content.ReadAsStringAsync();
+        response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+        content.Should().BeEquivalentTo("User not found");
+    }
+
+    [Fact(DisplayName = "DELETE /User/{id} com id inválido deve retornar not found")]
+    public async Task ShouldDeleteUserInvalid()
+    {
+        var response =  await client.DeleteAsync("/User/2");
+        var content = await response.Content.ReadAsStringAsync();
+        response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+        content.Should().BeEquivalentTo("User not found");
+    }
 }
