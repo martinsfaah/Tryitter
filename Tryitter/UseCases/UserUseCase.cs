@@ -2,7 +2,7 @@ using Tryitter.Repositories;
 using Tryitter.Services;
 using Tryitter.Models;
 namespace Tryitter.UseCases;
-public class UserUseCase
+public class UserUseCase : IUserUseCase
 {
   private IUserRepository _repository;
   public UserUseCase(IUserRepository repository)

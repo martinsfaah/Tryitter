@@ -11,8 +11,8 @@ namespace Tryitter.Controllers;
 [ApiController]
 public class UserController : ControllerBase
 {
-  private readonly UserUseCase _userUseCase;
-  public UserController(UserUseCase userUseCase)
+  private readonly IUserUseCase _userUseCase;
+  public UserController(IUserUseCase userUseCase)
   {
     _userUseCase = userUseCase;
   }
