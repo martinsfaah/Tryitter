@@ -14,9 +14,9 @@ public class AuthenticationService
   {
     var claims = new ClaimsIdentity();
 
+    claims.AddClaim(new Claim("UserId", value: user.UserId.ToString()));
     claims.AddClaim(new Claim(ClaimTypes.Email, user.Email));
     claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Username));
-    claims.AddClaim(new Claim(ClaimTypes.Name, user.Name));
 
     return claims;
   }
