@@ -44,6 +44,13 @@ public class UserUseCase
     return user;
   }
 
+  public List<User> GetByName(string name)
+  {
+    var user = _repository.GetByName(name);
+
+    return user;
+  }
+
   public User? Update(int id, User newUser)
   {
     var user = _repository.GetById(id);
