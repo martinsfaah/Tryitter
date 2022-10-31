@@ -93,6 +93,22 @@ public class UserController : ControllerBase
     }
   }
 
+  [HttpGet("Name/{name}")]
+  [AllowAnonymous]
+  public ActionResult<List<User>> GetByName([FromRoute] string name)
+  {
+    try
+    {
+      var user = _userUseCase.GetByName(name);
+
+      return Ok(user);
+    }
+    catch (Exception exception)
+    {
+      return BadRequest(exception.Message);
+    }
+  }
+
   [HttpPut("{id}")]
   [AllowAnonymous]
   public ActionResult<User> Update([FromRoute] string id, [FromBody] User newUser)
