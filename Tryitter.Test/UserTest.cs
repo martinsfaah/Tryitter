@@ -127,6 +127,32 @@ public class UserTest : IClassFixture<WebApplicationFactory<program>>
         content.Should().BeEquivalentTo("User not found");
     }
 
+    [Theory(DisplayName = "GET /User/Name/{name} deve retornar uma lista de users")]
+    [MemberData(nameof(ShouldGetUserbyNameData))]
+    public async Task ShouldGetUserbyName(List<User> usersExpected)
+    {
+        var response =  await client.GetAsync("/User/Name/Test");
+        var content = await response.Content.ReadAsStringAsync();
+        var result = JsonConvert.DeserializeObject<List<User>>(content);
+        response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+        result.Should().BeEquivalentTo(usersExpected);
+    }
+
+    public static readonly TheoryData<List<User>> ShouldGetUserbyNameData = new()
+    {
+        new()
+        {
+            new User 
+            { 
+              UserId = 1,
+              Username = "Test",
+              Name="Test",
+              Password="Test",
+              Email = "Test" 
+            }
+        }
+    };
+
     [Theory(DisplayName = "UPDATE /User/{id} deve retornar um user")]
     [MemberData(nameof(ShouldUpdateUserData))]
     public async Task ShouldUpdateUser(User userExpected)
