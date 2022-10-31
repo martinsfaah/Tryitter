@@ -10,7 +10,7 @@ DotNetEnv.Env.Load();
 builder.Services.AddControllers();
 builder.Services.AddDbContext<TryitterContext>();
 builder.Services.AddScoped<TryitterContext>();
-builder.Services.AddScoped<UserRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<UserUseCase>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

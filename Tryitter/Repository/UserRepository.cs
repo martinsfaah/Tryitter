@@ -3,7 +3,7 @@ using System.Data.Entity;
 
 namespace Tryitter.Repositories;
 
-public class UserRepository
+public class UserRepository : IUserRepository
 {
   private TryitterContext _context;
   public UserRepository(TryitterContext context)

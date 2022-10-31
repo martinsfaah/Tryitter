@@ -4,8 +4,8 @@ using Tryitter.Models;
 namespace Tryitter.UseCases;
 public class UserUseCase
 {
-  private UserRepository _repository;
-  public UserUseCase(UserRepository repository)
+  private IUserRepository _repository;
+  public UserUseCase(IUserRepository repository)
   {
     _repository = repository;
   }
