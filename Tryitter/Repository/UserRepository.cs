@@ -33,6 +33,13 @@ public class UserRepository
     return user;
   }
 
+  public List<User> GetByName(string name)
+  {
+    var user = _context.Users.Where(x => x.Name.Contains(name)).Include(x => x.Posts).ToList();
+
+    return user;
+  }
+
   public User Update(User user)
   {
     _context.Update(user);
