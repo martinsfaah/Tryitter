@@ -56,7 +56,7 @@ public class UserController : ControllerBase
 
   [HttpGet]
   [AllowAnonymous]
-  public ActionResult<User> GetAll()
+  public ActionResult<List<User>> GetAll()
   {
     try
     {
