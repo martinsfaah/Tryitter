@@ -16,7 +16,7 @@ public class UserController : ControllerBase
     _userUseCase = userUseCase;
   }
 
-  [HttpPost("/auth")]
+  [HttpPost("/Auth")]
   [AllowAnonymous]
   public async Task<ActionResult<string>> Authenticate([FromBody] AuthenticateRequest user)
   {
