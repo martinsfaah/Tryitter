@@ -145,5 +145,51 @@ public class PostTest : IClassFixture<WebApplicationFactory<program>>
         content.Should().BeEquivalentTo("Post not found");
     }
 
+    [Theory(DisplayName = "UPDATE /Post/{id} deve retornar um post")]
+    [MemberData(nameof(ShouldUpdatePostData))]
+    public async Task ShouldUpdatePost(Post postExpected)
+    {
+        var json = JsonConvert.SerializeObject(postExpected);
+        var body = new StringContent(json, Encoding.UTF8, "application/json"); 
+        var response =  await client.PutAsync("/Post/1", body);
+        var content = await response.Content.ReadAsStringAsync();
+        var result = JsonConvert.DeserializeObject<Post>(content);
+        response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+        result.Should().BeEquivalentTo(postExpected);
+    }
+
+    public static readonly TheoryData<Post> ShouldUpdatePostData = new()
+    {
+        new Post 
+        { 
+            PostId = 1,
+            Content = "newTest",
+            ImageUrl ="newTest",
+            UserId = 1
+        }
+    };
+
+    [Theory(DisplayName = "UPDATE /Post/{id} com id inválido deve retornar not found")]
+    [MemberData(nameof(ShouldUpdatePostInvalidData))]
+    public async Task ShouldUpdatePostInvalid(Post postExpected)
+    {
+        var json = JsonConvert.SerializeObject(postExpected);
+        var body = new StringContent(json, Encoding.UTF8, "application/json");
+        var response =  await client.PutAsync("/Post/2", body);
+        var content = await response.Content.ReadAsStringAsync();
+        response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+        content.Should().BeEquivalentTo("Post not found");
+    }
+    public static readonly TheoryData<Post> ShouldUpdatePostInvalidData = new()
+    {
+        new Post 
+        { 
+            PostId = 1,
+            Content = "newTest",
+            ImageUrl ="newTest",
+            UserId = 1 
+        }
+    };
+
 
 }
