@@ -42,8 +42,8 @@ public class UserTest : IClassFixture<WebApplicationFactory<program>>
     }
 
     [Theory(DisplayName = "POST /User deve retornar o user criado")]
-    [MemberData(nameof(ShouldCreateAVideoData))]
-    public async Task ShouldCreateAVideo(User userExpected)
+    [MemberData(nameof(ShouldCreateAUserData))]
+    public async Task ShouldCreateAUser(User userExpected)
     {
         var json = JsonConvert.SerializeObject(userExpected);
         var body = new StringContent(json, Encoding.UTF8, "application/json"); 
@@ -58,7 +58,7 @@ public class UserTest : IClassFixture<WebApplicationFactory<program>>
         result.UserId.Should().Be(2);
     }
 
-    public static readonly TheoryData<User> ShouldCreateAVideoData = new()
+    public static readonly TheoryData<User> ShouldCreateAUserData = new()
     {
         new User()
         {
@@ -206,7 +206,7 @@ public class UserTest : IClassFixture<WebApplicationFactory<program>>
     {
         var resp =  await client.DeleteAsync("/User/1");
         resp.StatusCode.Should().Be(System.Net.HttpStatusCode.NoContent);
-        var response =  await client.GetAsync("/User/2");
+        var response =  await client.GetAsync("/User/1");
         var content = await response.Content.ReadAsStringAsync();
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
         content.Should().BeEquivalentTo("User not found");
