@@ -191,5 +191,23 @@ public class PostTest : IClassFixture<WebApplicationFactory<program>>
         }
     };
 
+    [Fact(DisplayName = "DELETE /Post/{id} deve apagar um post")]
+    public async Task ShouldDeletePostbyId()
+    {
+        var resp =  await client.DeleteAsync("/Post/1");
+        resp.StatusCode.Should().Be(System.Net.HttpStatusCode.NoContent);
+        var response =  await client.GetAsync("/Post/1");
+        var content = await response.Content.ReadAsStringAsync();
+        response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+        content.Should().BeEquivalentTo("Post not found");
+    }
 
+    [Fact(DisplayName = "DELETE /Post/{id} com id inválido deve retornar not found")]
+    public async Task ShouldDeletePostInvalid()
+    {
+        var response =  await client.DeleteAsync("/Post/2");
+        var content = await response.Content.ReadAsStringAsync();
+        response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+        content.Should().BeEquivalentTo("Post not found");
+    }
 }
