@@ -40,5 +40,22 @@ public class PostUseCase : IPostUseCase
     return post;
   }
 
+  public Post? Update(int id, Post newPost)
+  {
+    var post = _repository.GetById(id);
+
+    if (post is null)
+    {
+      return null;
+    }
+
+    post.UserId = newPost.UserId;
+    post.Content = newPost.Content;
+    post.ImageUrl = newPost.ImageUrl;
+
+    var updated = _repository.Update(post);
+
+    return updated;
+  }
 
 }
