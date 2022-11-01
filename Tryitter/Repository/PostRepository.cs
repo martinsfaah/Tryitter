@@ -26,5 +26,12 @@ public class PostRepository : IPostRepository
     return posts;
   }
 
+  public Post? GetById(int id)
+  {
+    var post = _context.Posts.Where(x => x.PostId == id).FirstOrDefault();
+
+    return post;
+  }
+
 
 }
