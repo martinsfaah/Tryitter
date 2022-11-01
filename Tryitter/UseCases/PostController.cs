@@ -54,5 +54,27 @@ public class PostController : ControllerBase
     }
   }
 
+  [HttpGet("{id}")]
+  [AllowAnonymous]
+  public ActionResult<Post> GetById([FromRoute] string id)
+  {
+    try
+    {
+      int IdNumber = Convert.ToInt32(id);
+      
+      var post = _postUseCase.GetById(IdNumber);
+
+      if (post is null)
+      {
+        return NotFound("Post not found");
+      }
+
+      return Ok(post);
+    }
+    catch (Exception exception)
+    {
+      return BadRequest(exception.Message);
+    }
+  }
 
 }
