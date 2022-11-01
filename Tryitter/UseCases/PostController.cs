@@ -77,4 +77,27 @@ public class PostController : ControllerBase
     }
   }
 
+  [HttpPut("{id}")]
+  [AllowAnonymous]
+  public ActionResult<Post> Update([FromRoute] string id, [FromBody] Post newPost)
+  {
+    try
+    {
+      int IdNumber = Convert.ToInt32(id);
+      
+      var post = _postUseCase.Update(IdNumber, newPost);
+
+      if (post is null)
+      {
+        return NotFound("Post not found");
+      }
+
+      return Ok(post);
+    }
+    catch (Exception exception)
+    {
+      return BadRequest(exception.Message);
+    }
+  }
+
 }
