@@ -33,5 +33,12 @@ public class PostRepository : IPostRepository
     return post;
   }
 
+  public Post Update(Post post)
+  {
+    _context.Update(post);
+    _context.SaveChanges();
+
+    return post;
+  }
 
 }
