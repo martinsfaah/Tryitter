@@ -3,7 +3,7 @@ using System.Data.Entity;
 
 namespace Tryitter.Repositories;
 
-public class UserRepository
+public class UserRepository : IUserRepository
 {
   private TryitterContext _context;
   public UserRepository(TryitterContext context)
@@ -29,6 +29,13 @@ public class UserRepository
   public User? GetById(int id)
   {
     var user = _context.Users.Where(x => x.UserId == id).Include(x => x.Posts).FirstOrDefault();
+
+    return user;
+  }
+
+  public List<User> GetByName(string name)
+  {
+    var user = _context.Users.Where(x => x.Name.Contains(name)).Include(x => x.Posts).ToList();
 
     return user;
   }

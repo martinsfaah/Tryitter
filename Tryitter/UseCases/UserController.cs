@@ -11,8 +11,8 @@ namespace Tryitter.Controllers;
 [ApiController]
 public class UserController : ControllerBase
 {
-  private readonly UserUseCase _userUseCase;
-  public UserController(UserUseCase userUseCase)
+  private readonly IUserUseCase _userUseCase;
+  public UserController(IUserUseCase userUseCase)
   {
     _userUseCase = userUseCase;
   }
@@ -56,7 +56,7 @@ public class UserController : ControllerBase
 
   [HttpGet]
   [AllowAnonymous]
-  public ActionResult<User> GetAll()
+  public ActionResult<List<User>> GetAll()
   {
     try
     {
@@ -84,6 +84,22 @@ public class UserController : ControllerBase
       {
         return NotFound("User not found");
       }
+
+      return Ok(user);
+    }
+    catch (Exception exception)
+    {
+      return BadRequest(exception.Message);
+    }
+  }
+
+  [HttpGet("Name/{name}")]
+  [AllowAnonymous]
+  public ActionResult<List<User>> GetByName([FromRoute] string name)
+  {
+    try
+    {
+      var user = _userUseCase.GetByName(name);
 
       return Ok(user);
     }

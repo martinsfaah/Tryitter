@@ -2,10 +2,10 @@ using Tryitter.Repositories;
 using Tryitter.Services;
 using Tryitter.Models;
 namespace Tryitter.UseCases;
-public class UserUseCase
+public class UserUseCase : IUserUseCase
 {
-  private UserRepository _repository;
-  public UserUseCase(UserRepository repository)
+  private IUserRepository _repository;
+  public UserUseCase(IUserRepository repository)
   {
     _repository = repository;
   }
@@ -40,6 +40,13 @@ public class UserUseCase
   public User? GetById(int id)
   {
     var user = _repository.GetById(id);
+
+    return user;
+  }
+
+  public List<User> GetByName(string name)
+  {
+    var user = _repository.GetByName(name);
 
     return user;
   }
