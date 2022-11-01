@@ -33,5 +33,12 @@ public class PostUseCase : IPostUseCase
     return posts;
   }
 
+  public Post? GetById(int id)
+  {
+    var post = _repository.GetById(id);
+
+    return post;
+  }
+
 
 }
