@@ -41,4 +41,10 @@ public class PostRepository : IPostRepository
     return post;
   }
 
+  public Post Delete(Post post)
+  {
+    _context.Remove(post);
+    _context.SaveChanges();
+    return post;
+  }
 }

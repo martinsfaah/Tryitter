@@ -8,4 +8,5 @@ public interface IPostRepository
   List<Post> GetAll();
   Post? GetById(int id);
   Post Update(Post post);
+  Post Delete(Post post);
 }
