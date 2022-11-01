@@ -26,5 +26,12 @@ public class PostUseCase : IPostUseCase
     return created;
   }
   
+  public List<Post> GetAll()
+  {
+    var posts = _repository.GetAll();
+
+    return posts;
+  }
+
 
 }
