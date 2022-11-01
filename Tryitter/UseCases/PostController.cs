@@ -100,4 +100,26 @@ public class PostController : ControllerBase
     }
   }
 
+  [HttpDelete("{id}")]
+  [AllowAnonymous]
+  public ActionResult Delete([FromRoute] string id)
+  {
+    try
+    {
+      int IdNumber = Convert.ToInt32(id);
+      
+      var post = _postUseCase.Delete(IdNumber);
+
+      if (post is null)
+      {
+        return NotFound("Post not found");
+      }
+
+      return NoContent();
+    }
+    catch (Exception exception)
+    {
+      return BadRequest(exception.Message);
+    }
+  }
 }
