@@ -38,5 +38,21 @@ public class PostController : ControllerBase
     }
   }
 
+  [HttpGet]
+  [AllowAnonymous]
+  public ActionResult<List<Post>> GetAll()
+  {
+    try
+    {
+      var posts = _postUseCase.GetAll();
+
+      return Ok(posts);
+    }
+    catch (Exception exception)
+    {
+      return BadRequest(exception.Message);
+    }
+  }
+
 
 }
