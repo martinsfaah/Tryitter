@@ -114,5 +114,36 @@ public class PostTest : IClassFixture<WebApplicationFactory<program>>
         }
     };
 
+    [Theory(DisplayName = "GET /Post/{id} deve retornar um post")]
+    [MemberData(nameof(ShouldGetPostbyIdData))]
+    public async Task ShouldGetPostbyId(Post postExpected)
+    {
+        var response =  await client.GetAsync("/Post/1");
+        var content = await response.Content.ReadAsStringAsync();
+        var result = JsonConvert.DeserializeObject<Post>(content);
+        response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+        result.Should().BeEquivalentTo(postExpected);
+    }
+
+    public static readonly TheoryData<Post> ShouldGetPostbyIdData = new()
+    {
+        new Post 
+        { 
+            PostId = 1,
+            Content = "Test",
+            ImageUrl ="Test",
+            UserId = 1 
+        }
+    };
+
+    [Fact(DisplayName = "GET /Post/{id} com id inválido deve retornar not found")]
+    public async Task ShouldGetPostInvalid()
+    {
+        var response =  await client.GetAsync("/Post/2");
+        var content = await response.Content.ReadAsStringAsync();
+        response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+        content.Should().BeEquivalentTo("Post not found");
+    }
+
 
 }
