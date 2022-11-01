@@ -8,4 +8,5 @@ public interface IPostUseCase
   List<Post> GetAll();
   Post? GetById(int id);
   Post? Update(int id, Post newPost);
+  Post? Delete(int id);
 }

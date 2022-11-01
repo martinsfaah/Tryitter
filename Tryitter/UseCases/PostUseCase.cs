@@ -58,4 +58,17 @@ public class PostUseCase : IPostUseCase
     return updated;
   }
 
+  public Post? Delete(int id)
+  {
+    var post = _repository.GetById(id);
+
+    if (post is null)
+    {
+      return null;
+    }
+    
+    var deletedPost = _repository.Delete(post);
+
+    return deletedPost;
+  }
 }
