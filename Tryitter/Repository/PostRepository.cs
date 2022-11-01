@@ -19,5 +19,12 @@ public class PostRepository : IPostRepository
     return post;
   }
   
+  public List<Post> GetAll()
+  {
+    var posts = _context.Posts.ToList();
+
+    return posts;
+  }
+
 
 }
