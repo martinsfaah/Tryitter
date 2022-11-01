@@ -89,5 +89,30 @@ public class PostTest : IClassFixture<WebApplicationFactory<program>>
         }
     };
 
+    [Theory(DisplayName = "GET /Post deve retornar uma lista de posts")]
+    [MemberData(nameof(ShouldGetAllPostsData))]
+    public async Task ShouldGetAllPosts(List<Post> postsExpected)
+    {
+        var response =  await client.GetAsync("/Post");
+        var content = await response.Content.ReadAsStringAsync();
+        var result = JsonConvert.DeserializeObject<List<Post>>(content);
+        response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+        result.Should().BeEquivalentTo(postsExpected);
+    }
+
+    public static readonly TheoryData<List<Post>> ShouldGetAllPostsData = new()
+    {
+        new()
+        {
+            new Post 
+            { 
+              PostId = 1,
+              Content = "Test",
+              ImageUrl ="Test",
+              UserId = 1
+            }
+        }
+    };
+
 
 }
