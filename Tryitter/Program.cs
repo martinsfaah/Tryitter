@@ -14,7 +14,6 @@ builder.Services.AddControllers().AddJsonOptions(options =>
     options.JsonSerializerOptions.WriteIndented = true;
 });
 builder.Services.AddDbContext<TryitterContext>();
-builder.Services.AddScoped<TryitterContext>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserUseCase, UserUseCase>();
 builder.Services.AddScoped<IPostRepository, PostRepository>();

@@ -1,5 +1,5 @@
 using Tryitter.Models;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Tryitter.Repositories;
 
@@ -35,7 +35,7 @@ public class UserRepository : IUserRepository
 
   public List<User> GetByName(string name)
   {
-    var user = _context.Users.Where(x => x.Name.Contains(name)).Include(x => x.Posts).ToList();
+    var user = _context.Users.Where(x => x.Name.Contains(name)).ToList();
 
     return user;
   }

@@ -1,5 +1,5 @@
 using Tryitter.Models;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Tryitter.Repositories;
 
