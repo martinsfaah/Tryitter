@@ -11,40 +11,40 @@ public class PostRepository : IPostRepository
     _context = context;
   }
 
-  public Post Create(Post post)
+  public async Task<Post> Create(Post post)
   {
-    _context.Posts.Add(post);
-    _context.SaveChanges();
+    await _context.Posts.AddAsync(post);
+    await _context.SaveChangesAsync();
 
     return post;
   }
   
-  public List<Post> GetAll()
+  public async Task<List<Post>> GetAll()
   {
-    var posts = _context.Posts.ToList();
+    var posts = await _context.Posts.ToListAsync();
 
     return posts;
   }
 
-  public Post? GetById(int id)
+  public async Task<Post?> GetById(int id)
   {
-    var post = _context.Posts.Where(x => x.PostId == id).FirstOrDefault();
+    var post = await _context.Posts.Where(x => x.PostId == id).FirstOrDefaultAsync();
 
     return post;
   }
 
-  public Post Update(Post post)
+  public async Task<Post> Update(Post post)
   {
     _context.Update(post);
-    _context.SaveChanges();
+    await _context.SaveChangesAsync();
 
     return post;
   }
 
-  public Post Delete(Post post)
+  public async Task<Post> Delete(Post post)
   {
     _context.Remove(post);
-    _context.SaveChanges();
+    await _context.SaveChangesAsync();
     return post;
   }
 }

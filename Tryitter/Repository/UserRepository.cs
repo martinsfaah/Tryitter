@@ -11,44 +11,44 @@ public class UserRepository : IUserRepository
     _context = context;
   }
 
-  public User Create(User user)
+  public async Task<User> Create(User user)
   {
-    _context.Users.Add(user);
-    _context.SaveChanges();
+    await _context.Users.AddAsync(user);
+    await _context.SaveChangesAsync();
 
     return user;
   }
   
-  public List<User> GetAll()
+  public async Task<List<User>> GetAll()
   {
-    var users = _context.Users.ToList();
+    var users = await _context.Users.ToListAsync();
 
     return users;
   }
 
-  public User? GetById(int id)
+  public async Task<User?> GetById(int id)
   {
-    var user = _context.Users.Where(x => x.UserId == id).Include(x => x.Posts).FirstOrDefault();
+    var user = await _context.Users.Where(x => x.UserId == id).Include(x => x.Posts).FirstOrDefaultAsync();
 
     return user;
   }
 
-  public List<User> GetByName(string name)
+  public async Task<List<User>> GetByName(string name)
   {
-    var user = _context.Users.Where(x => x.Name.Contains(name)).Include(x => x.Posts).ToList();
+    var user = await _context.Users.Where(x => x.Name.Contains(name)).Include(x => x.Posts).ToListAsync();
 
     return user;
   }
 
-  public User Update(User user)
+  public async Task<User> Update(User user)
   {
     _context.Update(user);
-    _context.SaveChanges();
+    await _context.SaveChangesAsync();
 
     return user;
   }
   
-  public User Delete(User user)
+  public async Task<User> Delete(User user)
   {
     if (user.Posts is not null)
     {
@@ -58,7 +58,7 @@ public class UserRepository : IUserRepository
       }
     }
     _context.Remove(user);
-    _context.SaveChanges();
+    await _context.SaveChangesAsync();
     return user;
   }
 

@@ -4,9 +4,9 @@ namespace Tryitter.Repositories;
 
 public interface IPostRepository
 {
-  Post Create(Post post);
-  List<Post> GetAll();
-  Post? GetById(int id);
-  Post Update(Post post);
-  Post Delete(Post post);
+  Task<Post> Create(Post post);
+  Task<List<Post>> GetAll();
+  Task<Post?> GetById(int id);
+  Task<Post> Update(Post post);
+  Task<Post> Delete(Post post);
 }

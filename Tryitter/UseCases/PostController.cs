@@ -32,9 +32,6 @@ public class PostController : ControllerBase
       }
 
       return CreatedAtAction("GetById", new { id = created.PostId }, created);
-
-      // return File(data[0], post.ImageUrl.ContentType);
-      // return Ok(created);
     }
     catch (Exception exception)
     {
@@ -44,11 +41,11 @@ public class PostController : ControllerBase
 
   [HttpGet]
   [AllowAnonymous]
-  public ActionResult<List<Post>> GetAll()
+  public async Task<ActionResult<List<Post>>> GetAll()
   {
     try
     {
-      var posts = _postUseCase.GetAll();
+      var posts = await _postUseCase.GetAll();
 
       return Ok(posts);
     }
@@ -60,13 +57,13 @@ public class PostController : ControllerBase
 
   [HttpGet("{id}")]
   [AllowAnonymous]
-  public ActionResult<Post> GetById([FromRoute] string id)
+  public async Task<ActionResult<Post>> GetById([FromRoute] string id)
   {
     try
     {
       int IdNumber = Convert.ToInt32(id);
       
-      var post = _postUseCase.GetById(IdNumber);
+      var post = await _postUseCase.GetById(IdNumber);
 
       if (post is null)
       {
@@ -83,13 +80,13 @@ public class PostController : ControllerBase
 
   [HttpGet("Image/{id}")]
   [AllowAnonymous]
-  public ActionResult GetImage([FromRoute] string id)
+  public async Task<ActionResult> GetImage([FromRoute] string id)
   {
     try
     {
       int IdNumber = Convert.ToInt32(id);
       
-      var post = _postUseCase.GetById(IdNumber);
+      var post = await _postUseCase.GetById(IdNumber);
 
       if (post is null)
       {
@@ -106,13 +103,13 @@ public class PostController : ControllerBase
 
   [HttpPut("{id}")]
   [AllowAnonymous]
-  public ActionResult<Post> Update([FromRoute] string id, [FromBody] Post newPost)
+  public async Task<ActionResult<Post>> Update([FromRoute] string id, [FromBody] Post newPost)
   {
     try
     {
       int IdNumber = Convert.ToInt32(id);
       
-      var post = _postUseCase.Update(IdNumber, newPost);
+      var post = await _postUseCase.Update(IdNumber, newPost);
 
       if (post is null)
       {
@@ -129,13 +126,13 @@ public class PostController : ControllerBase
 
   [HttpDelete("{id}")]
   [AllowAnonymous]
-  public ActionResult Delete([FromRoute] string id)
+  public async Task<ActionResult> Delete([FromRoute] string id)
   {
     try
     {
       int IdNumber = Convert.ToInt32(id);
       
-      var post = _postUseCase.Delete(IdNumber);
+      var post = await _postUseCase.Delete(IdNumber);
 
       if (post is null)
       {

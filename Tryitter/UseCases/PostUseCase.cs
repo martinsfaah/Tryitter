@@ -15,7 +15,7 @@ public class PostUseCase : IPostUseCase
   
   public async Task<Post?> Create(Postrequest post)
   {
-    var user = _userRepository.GetById(post.UserId);
+    var user = await _userRepository.GetById(post.UserId);
 
     if (user is null)
     {
@@ -39,28 +39,28 @@ public class PostUseCase : IPostUseCase
 
     var newPost = new Post() { Content = post.Content, ImageUrl = data[0], ContentType = post.ImageUrl.ContentType, UserId = post.UserId, User = user };
     
-    var created = _repository.Create(newPost);
+    var created = await _repository.Create(newPost);
 
     return created;
   }
   
-  public List<Post> GetAll()
+  public async Task<List<Post>> GetAll()
   {
-    var posts = _repository.GetAll();
+    var posts = await _repository.GetAll();
 
     return posts;
   }
 
-  public Post? GetById(int id)
+  public async Task<Post?> GetById(int id)
   {
-    var post = _repository.GetById(id);
+    var post = await _repository.GetById(id);
 
     return post;
   }
 
-  public Post? Update(int id, Post newPost)
+  public async Task<Post?> Update(int id, Post newPost)
   {
-    var post = _repository.GetById(id);
+    var post = await _repository.GetById(id);
 
     if (post is null)
     {
@@ -70,21 +70,21 @@ public class PostUseCase : IPostUseCase
     post.UserId = newPost.UserId;
     post.Content = newPost.Content;
 
-    var updated = _repository.Update(post);
+    var updated = await _repository.Update(post);
 
     return updated;
   }
 
-  public Post? Delete(int id)
+  public async Task<Post?> Delete(int id)
   {
-    var post = _repository.GetById(id);
+    var post = await _repository.GetById(id);
 
     if (post is null)
     {
       return null;
     }
     
-    var deletedPost = _repository.Delete(post);
+    var deletedPost = await _repository.Delete(post);
 
     return deletedPost;
   }
