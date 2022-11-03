@@ -28,14 +28,14 @@ public class UserRepository : IUserRepository
 
   public User? GetById(int id)
   {
-    var user = _context.Users.Where(x => x.UserId == id).FirstOrDefault();
+    var user = _context.Users.Where(x => x.UserId == id).Include(x => x.Posts).FirstOrDefault();
 
     return user;
   }
 
   public List<User> GetByName(string name)
   {
-    var user = _context.Users.Where(x => x.Name.Contains(name)).ToList();
+    var user = _context.Users.Where(x => x.Name.Contains(name)).Include(x => x.Posts).ToList();
 
     return user;
   }
