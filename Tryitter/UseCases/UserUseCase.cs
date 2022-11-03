@@ -21,4 +21,58 @@ public class UserUseCase
 
     return token;
   }
+  
+  public User Create(User user)
+  {
+    var created = _repository.Create(user);
+
+    return created;
+  }
+  
+  public List<User> GetAll()
+  {
+    var users = _repository.GetAll();
+
+    return users;
+  }
+
+  public User? GetById(int id)
+  {
+    var user = _repository.GetById(id);
+
+    return user;
+  }
+
+  public User? Update(int id, User newUser)
+  {
+    var user = _repository.GetById(id);
+
+    if (user is null)
+    {
+      return null;
+    }
+
+    user.Name = newUser.Name;
+    user.Username = newUser.Username;
+    user.Email = newUser.Email;
+    user.Password = newUser.Password;
+
+    var updated = _repository.Update(user);
+
+    return updated;
+  }
+
+  public User? Delete(int id)
+  {
+    var user = _repository.GetById(id);
+
+    if (user is null)
+    {
+      return null;
+    }
+    
+    var deletedUser = _repository.Delete(user);
+
+    return deletedUser;
+  }
 }
