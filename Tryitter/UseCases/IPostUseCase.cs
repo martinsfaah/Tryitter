@@ -1,10 +1,11 @@
 using Tryitter.Models;
+using Tryitter.RequestHandlers;
 
 namespace Tryitter.UseCases;
 
 public interface IPostUseCase
 {
-  Post? Create(Post post);
+  Task<Post?> Create(Postrequest post);
   List<Post> GetAll();
   Post? GetById(int id);
   Post? Update(int id, Post newPost);

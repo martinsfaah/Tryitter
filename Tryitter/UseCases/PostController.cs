@@ -19,11 +19,12 @@ public class PostController : ControllerBase
 
   [HttpPost]
   [AllowAnonymous]
-  public ActionResult<Post> Create([FromBody] Post post)
+  public async Task<ActionResult<Post>> Create([FromForm] Postrequest post)
   {
     try
     {
-      var created = _postUseCase.Create(post);
+      
+      var created = await _postUseCase.Create(post);
 
       if (created is null)
       {
@@ -31,6 +32,9 @@ public class PostController : ControllerBase
       }
 
       return CreatedAtAction("GetById", new { id = created.PostId }, created);
+
+      // return File(data[0], post.ImageUrl.ContentType);
+      // return Ok(created);
     }
     catch (Exception exception)
     {
@@ -70,6 +74,29 @@ public class PostController : ControllerBase
       }
 
       return Ok(post);
+    }
+    catch (Exception exception)
+    {
+      return BadRequest(exception.Message);
+    }
+  }
+
+  [HttpGet("Image/{id}")]
+  [AllowAnonymous]
+  public ActionResult GetImage([FromRoute] string id)
+  {
+    try
+    {
+      int IdNumber = Convert.ToInt32(id);
+      
+      var post = _postUseCase.GetById(IdNumber);
+
+      if (post is null)
+      {
+        return NotFound("Post not found");
+      }
+
+      return File(post.ImageUrl, post.ContentType);
     }
     catch (Exception exception)
     {

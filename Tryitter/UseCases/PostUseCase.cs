@@ -1,6 +1,7 @@
 using Tryitter.Repositories;
 using Tryitter.Services;
 using Tryitter.Models;
+using Tryitter.RequestHandlers;
 namespace Tryitter.UseCases;
 public class PostUseCase : IPostUseCase
 {
@@ -12,7 +13,7 @@ public class PostUseCase : IPostUseCase
     _userRepository = userRepository;
   }
   
-  public Post? Create(Post post)
+  public async Task<Post?> Create(Postrequest post)
   {
     var user = _userRepository.GetById(post.UserId);
 
@@ -20,8 +21,25 @@ public class PostUseCase : IPostUseCase
     {
       return null;
     }
+
+    List<byte[]> data = new();
+      if (post.ImageUrl is not null)
+      {
+        if (post.ImageUrl.Length > 0)
+        {
+          using (var stream = new MemoryStream())
+          {
+            await post.ImageUrl.CopyToAsync(stream);
+
+            data.Add(stream.ToArray());
+          }
+
+        }
+      }
+
+    var newPost = new Post() { Content = post.Content, ImageUrl = data[0], ContentType = post.ImageUrl.ContentType, UserId = post.UserId, User = user };
     
-    var created = _repository.Create(post);
+    var created = _repository.Create(newPost);
 
     return created;
   }
@@ -51,7 +69,6 @@ public class PostUseCase : IPostUseCase
 
     post.UserId = newPost.UserId;
     post.Content = newPost.Content;
-    post.ImageUrl = newPost.ImageUrl;
 
     var updated = _repository.Update(post);
 
