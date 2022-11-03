@@ -5,9 +5,9 @@ namespace Tryitter.UseCases;
 
 public interface IPostUseCase
 {
-  Task<Post?> Create(Postrequest post);
+  Task<Post?> Create(PostCreateRequest post);
   Task<List<Post>> GetAll();
   Task<Post?> GetById(int id);
-  Task<Post?> Update(int id, Post newPost);
+  Task<Post?> Update(int id, PostUpdateRequest newPost);
   Task<Post?> Delete(int id);
 }

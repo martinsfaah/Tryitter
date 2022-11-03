@@ -19,7 +19,7 @@ public class PostController : ControllerBase
 
   [HttpPost]
   [AllowAnonymous]
-  public async Task<ActionResult<Post>> Create([FromForm] Postrequest post)
+  public async Task<ActionResult<Post>> Create([FromForm] PostCreateRequest post)
   {
     try
     {
@@ -103,7 +103,7 @@ public class PostController : ControllerBase
 
   [HttpPut("{id}")]
   [AllowAnonymous]
-  public async Task<ActionResult<Post>> Update([FromRoute] string id, [FromBody] Post newPost)
+  public async Task<ActionResult<Post>> Update([FromRoute] string id,[FromBody] PostUpdateRequest newPost)
   {
     try
     {

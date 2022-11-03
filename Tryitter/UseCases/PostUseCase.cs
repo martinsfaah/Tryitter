@@ -13,7 +13,7 @@ public class PostUseCase : IPostUseCase
     _userRepository = userRepository;
   }
   
-  public async Task<Post?> Create(Postrequest post)
+  public async Task<Post?> Create(PostCreateRequest post)
   {
     var user = await _userRepository.GetById(post.UserId);
 
@@ -58,7 +58,7 @@ public class PostUseCase : IPostUseCase
     return post;
   }
 
-  public async Task<Post?> Update(int id, Post newPost)
+  public async Task<Post?> Update(int id, PostUpdateRequest newPost)
   {
     var post = await _repository.GetById(id);
 
