@@ -64,6 +64,8 @@ public class UserUseCase : IUserUseCase
     user.Username = newUser.Username;
     user.Email = newUser.Email;
     user.Password = newUser.Password;
+    user.Modulo = newUser.Modulo;
+    user.Status = newUser.Status;
 
     var updated = _repository.Update(user);
 

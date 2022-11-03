@@ -33,7 +33,7 @@ public class PostTest : IClassFixture<WebApplicationFactory<program>>
                     appContext.Database.EnsureCreated();
                     appContext.Database.EnsureDeleted();
                     appContext.Database.EnsureCreated();
-                    appContext.Users.Add(new User { UserId = 1, Username = "Test", Name="Test", Password="Test", Email = "Test" });
+                    appContext.Users.Add(new User { UserId = 1, Username = "Test", Name="Test", Password="Test", Email = "Test", Modulo = "Test", Status = "Test" });
                     appContext.Posts.Add(new Post { PostId = 1, Content = "Test", ImageUrl = "Test", UserId = 1 });
                     appContext.SaveChanges();
                 }

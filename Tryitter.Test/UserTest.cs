@@ -34,7 +34,7 @@ public class UserTest : IClassFixture<WebApplicationFactory<program>>
                     appContext.Database.EnsureCreated();
                     appContext.Database.EnsureDeleted();
                     appContext.Database.EnsureCreated();
-                    appContext.Users.Add(new User { UserId = 1, Username = "Test", Name="Test", Password="Test", Email = "Test" });
+                    appContext.Users.Add(new User { UserId = 1, Username = "Test", Name="Test", Password="Test", Email = "Test", Modulo = "Test", Status = "Test" });
                     appContext.SaveChanges();
                 }
             });
@@ -55,6 +55,8 @@ public class UserTest : IClassFixture<WebApplicationFactory<program>>
         result.Username.Should().Be(userExpected.Username);
         result.Email.Should().Be(userExpected.Email);
         result.Password.Should().Be(userExpected.Password);
+        result.Modulo.Should().Be(userExpected.Modulo);
+        result.Status.Should().Be(userExpected.Status);
         result.UserId.Should().Be(2);
     }
 
@@ -65,7 +67,9 @@ public class UserTest : IClassFixture<WebApplicationFactory<program>>
             Username = "user",
             Name = "name",
             Email = "email@email.com",
-            Password = "password123"
+            Password = "password123",
+            Modulo = "Front-End",
+            Status = "Ativo"
         }
     };
 
@@ -90,7 +94,9 @@ public class UserTest : IClassFixture<WebApplicationFactory<program>>
               Username = "Test",
               Name="Test",
               Password="Test",
-              Email = "Test" 
+              Email = "Test",
+              Modulo = "Test",
+              Status = "Test"
             }
         }
     };
@@ -114,7 +120,9 @@ public class UserTest : IClassFixture<WebApplicationFactory<program>>
             Username = "Test",
             Name="Test",
             Password="Test",
-            Email = "Test" 
+            Email = "Test",
+            Modulo = "Test",
+            Status = "Test"
         }
     };
 
@@ -148,7 +156,9 @@ public class UserTest : IClassFixture<WebApplicationFactory<program>>
               Username = "Test",
               Name="Test",
               Password="Test",
-              Email = "Test" 
+              Email = "Test",
+              Modulo = "Test",
+              Status = "Test"
             }
         }
     };
@@ -174,7 +184,9 @@ public class UserTest : IClassFixture<WebApplicationFactory<program>>
             Username = "newTest",
             Name="newTest",
             Password="newTest",
-            Email = "newTest" 
+            Email = "newTest",
+            Modulo = "newTest",
+            Status = "newTest"
         }
     };
 
@@ -197,7 +209,9 @@ public class UserTest : IClassFixture<WebApplicationFactory<program>>
             Username = "newTest",
             Name="newTest",
             Password="newTest",
-            Email = "newTest" 
+            Email = "newTest",
+            Modulo = "newTest",
+            Status = "newTest"
         }
     };
 

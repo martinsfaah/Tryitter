@@ -7,6 +7,8 @@ namespace Tryitter.Models
         public string Email { get; set; }
         public string Name { get; set; }
         public string Password { get; set; }
+        public string Modulo { get; set; }
+        public string Status { get; set; }
         public ICollection<Post>? Posts { get; }
     }
 }
