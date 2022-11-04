@@ -1,10 +1,14 @@
+namespace Tryitter.Controllers;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-
+using System.Security.Claims;
+using System.ComponentModel.DataAnnotations;
 
 using Tryitter.UseCases;
 using Tryitter.RequestHandlers;
-namespace Tryitter.Controllers;
+using Tryitter.Models;
+using Tryitter.Services;
 
 [Route("[controller]")]
 [ApiController]
@@ -54,7 +58,7 @@ public class UserController : ControllerBase
   }
 
   [HttpGet]
-  [AllowAnonymous]
+  [Authorize]
   public ActionResult<User> GetAll()
   {
     try
@@ -70,7 +74,7 @@ public class UserController : ControllerBase
   }
 
   [HttpGet("{id}")]
-  [AllowAnonymous]
+  [Authorize]
   public ActionResult<User> GetById([FromRoute] string id)
   {
     try
@@ -93,13 +97,21 @@ public class UserController : ControllerBase
   }
 
   [HttpPut("{id}")]
-  [AllowAnonymous]
-  public ActionResult<User> Update([FromRoute] string id, [FromBody] User newUser)
+  [Authorize]
+  public ActionResult<User> Update([FromRoute] string id, [FromBody] UpdateRequest newUser)
   {
     try
     {
+      var instance = new AuthorizationService();
+      var isValidUser = instance.VerifyIdentity(id, User);
+      if (!isValidUser)
+      {
+        return Unauthorized();
+      }
+
+
       int IdNumber = Convert.ToInt32(id);
-      
+
       var user = _userUseCase.Update(IdNumber, newUser);
 
       if (user is null)
@@ -116,11 +128,17 @@ public class UserController : ControllerBase
   }
 
   [HttpDelete("{id}")]
-  [AllowAnonymous]
+  [Authorize]
   public ActionResult Delete([FromRoute] string id)
   {
     try
     {
+      var isValidUser = new AuthorizationService().VerifyIdentity(id, User);
+      if (!isValidUser)
+      {
+        return Unauthorized();
+      }
+
       int IdNumber = Convert.ToInt32(id);
       
       var user = _userUseCase.Delete(IdNumber);
