@@ -23,37 +23,37 @@ public class UserUseCase : IUserUseCase
     return token;
   }
   
-  public User Create(User user)
+  public async Task<User> Create(User user)
   {
-    var created = _repository.Create(user);
+    var created = await _repository.Create(user);
 
     return created;
   }
   
-  public List<User> GetAll()
+  public async Task<List<User>> GetAll()
   {
-    var users = _repository.GetAll();
+    var users = await _repository.GetAll();
 
     return users;
   }
 
-  public User? GetById(int id)
+  public async Task<User?> GetById(int id)
   {
-    var user = _repository.GetById(id);
+    var user = await _repository.GetById(id);
 
     return user;
   }
 
-  public List<User> GetByName(string name)
+  public async Task<List<User>> GetByName(string name)
   {
-    var user = _repository.GetByName(name);
+    var user = await _repository.GetByName(name);
 
     return user;
   }
 
-  public User? Update(int id, User newUser)
+  public async Task<User?> Update(int id, User newUser)
   {
-    var user = _repository.GetById(id);
+    var user = await _repository.GetById(id);
 
     if (user is null)
     {
@@ -64,22 +64,24 @@ public class UserUseCase : IUserUseCase
     user.Username = newUser.Username;
     user.Email = newUser.Email;
     user.Password = newUser.Password;
+    user.Modulo = newUser.Modulo;
+    user.Status = newUser.Status;
 
-    var updated = _repository.Update(user);
+    var updated = await _repository.Update(user);
 
     return updated;
   }
 
-  public User? Delete(int id)
+  public async Task<User?> Delete(int id)
   {
-    var user = _repository.GetById(id);
+    var user = await _repository.GetById(id);
 
     if (user is null)
     {
       return null;
     }
     
-    var deletedUser = _repository.Delete(user);
+    var deletedUser = await _repository.Delete(user);
 
     return deletedUser;
   }

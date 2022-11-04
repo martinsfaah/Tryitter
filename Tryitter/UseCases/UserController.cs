@@ -40,11 +40,11 @@ public class UserController : ControllerBase
 
   [HttpPost]
   [AllowAnonymous]
-  public ActionResult<User> Create([FromBody] User user)
+  public async Task<ActionResult<User>> Create([FromBody] User user)
   {
     try
     {
-      var created = _userUseCase.Create(user);
+      var created = await _userUseCase.Create(user);
 
       return CreatedAtAction("GetById", new { id = created.UserId }, created);
     }
@@ -56,11 +56,11 @@ public class UserController : ControllerBase
 
   [HttpGet]
   [AllowAnonymous]
-  public ActionResult<List<User>> GetAll()
+  public async Task<ActionResult<List<User>>> GetAll()
   {
     try
     {
-      var users = _userUseCase.GetAll();
+      var users = await _userUseCase.GetAll();
 
       return Ok(users);
     }
@@ -72,13 +72,13 @@ public class UserController : ControllerBase
 
   [HttpGet("{id}")]
   [AllowAnonymous]
-  public ActionResult<User> GetById([FromRoute] string id)
+  public async Task<ActionResult<User>> GetById([FromRoute] string id)
   {
     try
     {
       int IdNumber = Convert.ToInt32(id);
       
-      var user = _userUseCase.GetById(IdNumber);
+      var user = await _userUseCase.GetById(IdNumber);
 
       if (user is null)
       {
@@ -95,11 +95,11 @@ public class UserController : ControllerBase
 
   [HttpGet("Name/{name}")]
   [AllowAnonymous]
-  public ActionResult<List<User>> GetByName([FromRoute] string name)
+  public async Task<ActionResult<List<User>>> GetByName([FromRoute] string name)
   {
     try
     {
-      var user = _userUseCase.GetByName(name);
+      var user = await _userUseCase.GetByName(name);
 
       return Ok(user);
     }
@@ -111,13 +111,13 @@ public class UserController : ControllerBase
 
   [HttpPut("{id}")]
   [AllowAnonymous]
-  public ActionResult<User> Update([FromRoute] string id, [FromBody] User newUser)
+  public async Task<ActionResult<User>> Update([FromRoute] string id, [FromBody] User newUser)
   {
     try
     {
       int IdNumber = Convert.ToInt32(id);
       
-      var user = _userUseCase.Update(IdNumber, newUser);
+      var user = await _userUseCase.Update(IdNumber, newUser);
 
       if (user is null)
       {
@@ -134,13 +134,13 @@ public class UserController : ControllerBase
 
   [HttpDelete("{id}")]
   [AllowAnonymous]
-  public ActionResult Delete([FromRoute] string id)
+  public async Task<ActionResult> Delete([FromRoute] string id)
   {
     try
     {
       int IdNumber = Convert.ToInt32(id);
       
-      var user = _userUseCase.Delete(IdNumber);
+      var user = await _userUseCase.Delete(IdNumber);
 
       if (user is null)
       {

@@ -7,10 +7,10 @@ namespace Tryitter.UseCases;
 public interface IUserUseCase
 {
   string? Auth(string Email, string Password);
-  User Create(User user);
-  List<User> GetAll();
-  User? GetById(int id);
-  List<User> GetByName(string name);
-  User? Update(int id, User newUser);
-  User? Delete(int id);
+  Task<User> Create(User user);
+  Task<List<User>> GetAll();
+  Task<User?> GetById(int id);
+  Task<List<User>> GetByName(string name);
+  Task<User?> Update(int id, User newUser);
+  Task<User?> Delete(int id);
 }
