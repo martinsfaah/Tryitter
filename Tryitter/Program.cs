@@ -1,3 +1,7 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+
+using System.Text;
 using Tryitter.Models;
 using Tryitter.Repositories;
 using Tryitter.UseCases;
@@ -7,9 +11,26 @@ var builder = WebApplication.CreateBuilder(args);
 DotNetEnv.Env.Load();
 // Add services to the container.
 
+var secret = Environment.GetEnvironmentVariable("DOTNET_JWT_SECRET");
+var key = Encoding.ASCII.GetBytes(secret);
+
+builder.Services.AddAuthentication(x => 
+{
+    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(x =>
+{
+    x.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ValidateIssuer = false,
+        ValidateAudience = false
+    };
+});
+
 builder.Services.AddControllers();
 builder.Services.AddDbContext<TryitterContext>();
-builder.Services.AddScoped<TryitterContext>();
 builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<UserUseCase>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
