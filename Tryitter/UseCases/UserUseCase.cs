@@ -6,10 +6,12 @@ using Tryitter.Models;
 using Tryitter.Repositories;
 using Tryitter.RequestHandlers;
 using Tryitter.Services;
-public class UserUseCase
+
+public class UserUseCase : IUserUseCase
 {
-  private readonly UserRepository _repository;
-  public UserUseCase(UserRepository repository)
+  private IUserRepository _repository;
+  public UserUseCase(IUserRepository repository)
+
   {
     _repository = repository;
   }
@@ -34,34 +36,43 @@ public class UserUseCase
     return token;
   }
   
-  public User Create(User user)
+  public async Task<User> Create(User user)
   {
     var passwordHash = BCrypt.HashPassword(user.Password);
 
     user.Password = passwordHash;
 
-    var created = _repository.Create(user);
+    var created = await _repository.Create(user);
+
 
     return created;
   }
   
-  public List<User> GetAll()
+  public async Task<List<User>> GetAll()
   {
-    var users = _repository.GetAll();
+    var users = await _repository.GetAll();
 
     return users;
   }
 
-  public User? GetById(int id)
+  public async Task<User?> GetById(int id)
   {
-    var user = _repository.GetById(id);
+    var user = await _repository.GetById(id);
 
     return user;
   }
 
-  public User? Update(int id, UpdateRequest newUser)
+
+  public async Task<List<User>> GetByName(string name)
   {
-    var user = _repository.GetById(id);
+    var user = await _repository.GetByName(name);
+
+    return user;
+  }
+
+  public async Task<User?> Update(int id, UpdateRequest newUser)
+  {
+    var user = await _repository.GetById(id);
 
     if (user is null)
     {
@@ -70,22 +81,24 @@ public class UserUseCase
 
     user.Name = newUser.Name;
     user.Email = newUser.Email;
+    user.Modulo = newUser.Modulo;
+    user.Status = newUser.Status;
 
-    var updated = _repository.Update(user);
+    var updated = await _repository.Update(user);
 
     return updated;
   }
 
-  public User? Delete(int id)
+  public async Task<User?> Delete(int id)
   {
-    var user = _repository.GetById(id);
+    var user = await _repository.GetById(id);
 
     if (user is null)
     {
       return null;
     }
     
-    var deletedUser = _repository.Delete(user);
+    var deletedUser = await _repository.Delete(user);
 
     return deletedUser;
   }
