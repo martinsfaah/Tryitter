@@ -1,10 +1,15 @@
-using Tryitter.Repositories;
-using Tryitter.Services;
 namespace Tryitter.UseCases;
+
+using BCrypt.Net;
+
+using Tryitter.Models;
+using Tryitter.Repositories;
+using Tryitter.RequestHandlers;
+using Tryitter.Services;
 public class UserUseCase
 {
-  private readonly IUserRepository _repository;
-  public UserUseCase(IUserRepository repository)
+  private readonly UserRepository _repository;
+  public UserUseCase(UserRepository repository)
   {
     _repository = repository;
   }
@@ -12,7 +17,14 @@ public class UserUseCase
   {
     var user = await _repository.GetByEmail(Email);
     
-    if (user == null || user.Password != Password)
+    if (user == null)
+    {
+      return null;
+    }
+
+    var isPasswordValid = BCrypt.Verify(Password, user.Password);
+
+    if (!isPasswordValid)
     {
       return null;
     }
@@ -24,6 +36,10 @@ public class UserUseCase
   
   public User Create(User user)
   {
+    var passwordHash = BCrypt.HashPassword(user.Password);
+
+    user.Password = passwordHash;
+
     var created = _repository.Create(user);
 
     return created;
@@ -43,7 +59,7 @@ public class UserUseCase
     return user;
   }
 
-  public User? Update(int id, User newUser)
+  public User? Update(int id, UpdateRequest newUser)
   {
     var user = _repository.GetById(id);
 
@@ -53,9 +69,7 @@ public class UserUseCase
     }
 
     user.Name = newUser.Name;
-    user.Username = newUser.Username;
     user.Email = newUser.Email;
-    user.Password = newUser.Password;
 
     var updated = _repository.Update(user);
 
