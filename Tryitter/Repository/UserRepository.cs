@@ -1,13 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 
 using Tryitter.Models;
-using System.Data.Entity;
 
 namespace Tryitter.Repositories;
 
 public class UserRepository : IUserRepository
 {
-  private TryitterContext _context;
+  private readonly TryitterContext _context;
   public UserRepository(TryitterContext context)
   {
     _context = context;
@@ -23,14 +22,14 @@ public class UserRepository : IUserRepository
   
   public List<User> GetAll()
   {
-    var users = _context.Users.Include(x => x.Posts).ToList();
+    var users = _context.Users.AsNoTracking().Include(x => x.Posts).ToList();
 
     return users;
   }
 
   public User? GetById(int id)
   {
-    var user = _context.Users.Where(x => x.UserId == id).Include(x => x.Posts).FirstOrDefault();
+    var user = _context.Users.AsNoTracking().Include(x => x.Posts).FirstOrDefault(x => x.UserId == id);
 
     return user;
   }
@@ -59,6 +58,6 @@ public class UserRepository : IUserRepository
 
   public async Task<User?> GetByEmail(string Email)
   {
-    return await _context.Users.FirstOrDefaultAsync(user => user.Email == Email);
+    return await _context.Users.AsNoTracking().FirstOrDefaultAsync(user => user.Email == Email);
   }
 }
