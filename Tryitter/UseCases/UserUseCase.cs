@@ -9,12 +9,13 @@ using Tryitter.Services;
 
 public class UserUseCase : IUserUseCase
 {
-  private IUserRepository _repository;
+  private readonly IUserRepository _repository;
   public UserUseCase(IUserRepository repository)
 
   {
     _repository = repository;
   }
+
   public async Task<string?> Auth(string Email, string Password)
   {
     var user = await _repository.GetByEmail(Email);
@@ -79,10 +80,10 @@ public class UserUseCase : IUserUseCase
       return null;
     }
 
-    user.Name = newUser.Name;
-    user.Email = newUser.Email;
-    user.Modulo = newUser.Modulo;
-    user.Status = newUser.Status;
+    user.Name = newUser.Name!;
+    user.Email = newUser.Email!;
+    user.Module = newUser.Module!;
+    user.Status = newUser.Status!;
 
     var updated = await _repository.Update(user);
 
