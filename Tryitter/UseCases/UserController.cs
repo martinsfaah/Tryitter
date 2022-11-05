@@ -2,8 +2,6 @@ namespace Tryitter.Controllers;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
-using System.ComponentModel.DataAnnotations;
 
 using Tryitter.UseCases;
 using Tryitter.RequestHandlers;
@@ -59,7 +57,7 @@ public class UserController : ControllerBase
 
   [HttpGet]
   [Authorize]
-  public async Task<ActionResult<List<User>>> GetAll()
+  public async Task<ActionResult<List<User>>> GetAll() // TODO Criar ViewModel para retornar usuários sem a senha
   {
     try
     {
@@ -97,7 +95,7 @@ public class UserController : ControllerBase
   }
 
   [HttpGet("Name/{name}")]
-  [AllowAnonymous]
+  [Authorize]
   public async Task<ActionResult<List<User>>> GetByName([FromRoute] string name)
   {
     try
@@ -118,15 +116,15 @@ public class UserController : ControllerBase
   {
     try
     {
-      var instance = new AuthorizationService();
-      var isValidUser = instance.VerifyIdentity(id, User);
+      var authorizationService = new AuthorizationService();
+      var isValidUser = authorizationService.VerifyIdentity(id, User);
       if (!isValidUser)
       {
         return Unauthorized();
       }
 
 
-      int IdNumber = Convert.ToInt32(id);
+      int IdNumber = Convert.ToInt32(id); // TODO Enviar para use case
 
       var user = await _userUseCase.Update(IdNumber, newUser);
 
@@ -150,13 +148,14 @@ public class UserController : ControllerBase
   {
     try
     {
-      var isValidUser = new AuthorizationService().VerifyIdentity(id, User);
+      var authorizationService = new AuthorizationService();
+      var isValidUser = authorizationService.VerifyIdentity(id, User);
       if (!isValidUser)
       {
         return Unauthorized();
       }
 
-      int IdNumber = Convert.ToInt32(id);
+      int IdNumber = Convert.ToInt32(id); // TODO Enviar para use case
       
       var user = await _userUseCase.Delete(IdNumber);
 

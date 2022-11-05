@@ -5,7 +5,6 @@ using System.Text;
 using Tryitter.Models;
 using Tryitter.Repositories;
 using Tryitter.UseCases;
-using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +13,7 @@ DotNetEnv.Env.Load();
 
 
 var secret = Environment.GetEnvironmentVariable("DOTNET_JWT_SECRET");
-var key = Encoding.ASCII.GetBytes(secret);
+var key = Encoding.ASCII.GetBytes(secret!);
 
 builder.Services.AddAuthentication(x => 
 {
@@ -31,11 +30,7 @@ builder.Services.AddAuthentication(x =>
     };
 });
 
-builder.Services.AddControllers().AddJsonOptions(options => 
-{ 
-    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-    options.JsonSerializerOptions.WriteIndented = true;
-});
+builder.Services.AddControllers();
 builder.Services.AddDbContext<TryitterContext>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserUseCase, UserUseCase>();
@@ -67,5 +62,3 @@ var context = new TryitterContext();
 context.Database.EnsureCreated();
 
 app.Run();
-
-public partial class program {}

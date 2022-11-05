@@ -22,7 +22,7 @@ public class UserRepository : IUserRepository
   
   public async Task<List<User>> GetAll()
   {
-    var users = await _context.Users.ToListAsync();
+    var users = await _context.Users.AsNoTracking().ToListAsync();
 
 
     return users;
@@ -30,14 +30,14 @@ public class UserRepository : IUserRepository
 
   public async Task<User?> GetById(int id)
   {
-    var user = await _context.Users.Where(x => x.UserId == id).Include(x => x.Posts).FirstOrDefaultAsync();
+    var user = await _context.Users.Include(x => x.Posts).FirstOrDefaultAsync(x => x.UserId == id);
 
     return user;
   }
 
   public async Task<List<User>> GetByName(string name)
   {
-    var user = await _context.Users.Where(x => x.Name.Contains(name)).Include(x => x.Posts).ToListAsync();
+    var user = await _context.Users.AsNoTracking().Where(x => x.Name.Contains(name)).Include(x => x.Posts).ToListAsync();
 
     return user;
   }
@@ -56,7 +56,7 @@ public class UserRepository : IUserRepository
     {
       for (int i = 0; i < user.Posts.Count; i++)
       {
-        _context.Remove(user.Posts.ToList()[i]);
+        _context.Remove(user.Posts.ToList()[i]); // ! Pode resolver com map
       }
     }
     _context.Remove(user);

@@ -1,11 +1,12 @@
+namespace Tryitter.Controllers;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-
 
 using Tryitter.UseCases;
 using Tryitter.Models;
 using Tryitter.RequestHandlers;
-namespace Tryitter.Controllers;
+using Tryitter.Services;
 
 [Route("[controller]")]
 [ApiController]
@@ -18,13 +19,14 @@ public class PostController : ControllerBase
   }
 
   [HttpPost]
-  [AllowAnonymous]
-  public async Task<ActionResult<Post>> Create([FromForm] PostCreateRequest post)
+  [Authorize]
+  public async Task<ActionResult<Post>> Create([FromBody] PostCreateRequest post)
   {
     try
     {
-      
-      var created = await _postUseCase.Create(post);
+      var userId = User.FindFirst("Id")!.Value;
+
+      var created = await _postUseCase.Create(post, userId);
 
       if (created is null)
       {
@@ -40,7 +42,7 @@ public class PostController : ControllerBase
   }
 
   [HttpGet]
-  [AllowAnonymous]
+  [Authorize]
   public async Task<ActionResult<List<Post>>> GetAll()
   {
     try
@@ -56,14 +58,12 @@ public class PostController : ControllerBase
   }
 
   [HttpGet("{id}")]
-  [AllowAnonymous]
+  [Authorize]
   public async Task<ActionResult<Post>> GetById([FromRoute] string id)
   {
     try
-    {
-      int IdNumber = Convert.ToInt32(id);
-      
-      var post = await _postUseCase.GetById(IdNumber);
+    {      
+      var post = await _postUseCase.GetById(id);
 
       if (post is null)
       {
@@ -71,29 +71,6 @@ public class PostController : ControllerBase
       }
 
       return Ok(post);
-    }
-    catch (Exception exception)
-    {
-      return BadRequest(exception.Message);
-    }
-  }
-
-  [HttpGet("Image/{id}")]
-  [AllowAnonymous]
-  public async Task<ActionResult> GetImage([FromRoute] string id)
-  {
-    try
-    {
-      int IdNumber = Convert.ToInt32(id);
-      
-      var post = await _postUseCase.GetById(IdNumber);
-
-      if (post is null)
-      {
-        return NotFound("Post not found");
-      }
-
-      return File(post.ImageUrl, post.ContentType);
     }
     catch (Exception exception)
     {
@@ -102,42 +79,56 @@ public class PostController : ControllerBase
   }
 
   [HttpPut("{id}")]
-  [AllowAnonymous]
-  public async Task<ActionResult<Post>> Update([FromRoute] string id,[FromBody] PostUpdateRequest newPost)
+  [Authorize]
+  public async Task<ActionResult<Post>> Update([FromRoute] string id,[FromBody] UpdatePostRequest updatePostRequest)
   {
     try
     {
-      int IdNumber = Convert.ToInt32(id);
-      
-      var post = await _postUseCase.Update(IdNumber, newPost);
+      var post = await _postUseCase.GetById(id);
 
       if (post is null)
       {
         return NotFound("Post not found");
       }
+
+      var authorizationService = new AuthorizationService();
+      var isPostUserOrAdmin = authorizationService.VerifyIdentity(post.UserId.ToString(), User);
+      if(!isPostUserOrAdmin)
+      {
+        return Unauthorized();
+      }
+
+
+      var updatedPost = await _postUseCase.Update(id, updatePostRequest.content);
 
       return Ok(post);
     }
     catch (Exception exception)
     {
-      return BadRequest(exception.Message);
+      return BadRequest(exception.Message); 
     }
   }
 
   [HttpDelete("{id}")]
-  [AllowAnonymous]
+  [Authorize]
   public async Task<ActionResult> Delete([FromRoute] string id)
   {
     try
     {
-      int IdNumber = Convert.ToInt32(id);
-      
-      var post = await _postUseCase.Delete(IdNumber);
-
+      var post = await _postUseCase.GetById(id);
       if (post is null)
       {
         return NotFound("Post not found");
       }
+      
+      var authorizationService = new AuthorizationService();
+      var isPostUserOrAdmin = authorizationService.VerifyIdentity(post.UserId.ToString(), User);
+      if(!isPostUserOrAdmin)
+      {
+        return Unauthorized();
+      }
+      
+      await _postUseCase.Delete(post);
 
       return NoContent();
     }
@@ -146,4 +137,26 @@ public class PostController : ControllerBase
       return BadRequest(exception.Message);
     }
   }
+
+  // ? Se vir do front não precisa retornar convertido
+  // [HttpGet("Image/{id}")]
+  // [Authorize]
+  // public async Task<ActionResult> GetImage([FromRoute] string id)
+  // {
+  //   try
+  //   {
+  //     var post = await _postUseCase.GetById(id);
+
+  //     if (post is null)
+  //     {
+  //       return NotFound("Post not found");
+  //     }
+
+  //     return File(post.ImageUrl, post.ContentType);
+  //   }
+  //   catch (Exception exception)
+  //   {
+  //     return BadRequest(exception.Message);
+  //   }
+  // }
 }

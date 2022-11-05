@@ -5,7 +5,7 @@ namespace Tryitter.Repositories;
 
 public class PostRepository : IPostRepository
 {
-  private TryitterContext _context;
+  private readonly TryitterContext _context;
   public PostRepository(TryitterContext context)
   {
     _context = context;
@@ -21,14 +21,14 @@ public class PostRepository : IPostRepository
   
   public async Task<List<Post>> GetAll()
   {
-    var posts = await _context.Posts.ToListAsync();
+    var posts = await _context.Posts.AsNoTracking().ToListAsync();
 
     return posts;
   }
 
   public async Task<Post?> GetById(int id)
   {
-    var post = await _context.Posts.Where(x => x.PostId == id).FirstOrDefaultAsync();
+    var post = await _context.Posts.FirstOrDefaultAsync(x => x.PostId == id);
 
     return post;
   }
