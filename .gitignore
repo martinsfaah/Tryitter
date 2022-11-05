@@ -6,6 +6,7 @@
 bin/
 obj/
 .env
+.vscode
 
 # User-specific files
 *.rsuser

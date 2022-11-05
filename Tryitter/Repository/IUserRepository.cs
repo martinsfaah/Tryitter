@@ -10,5 +10,6 @@ public interface IUserRepository
   Task<List<User>> GetByName(string name);
   Task<User> Update(User user);
   Task<User> Delete(User user);
-  User? GetByEmail(string Email);
+  Task<User?> GetByEmail(string Email);
 }
+

@@ -1,11 +1,12 @@
+namespace Tryitter.Controllers;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 
-
 using Tryitter.UseCases;
-using Tryitter.Models;
 using Tryitter.RequestHandlers;
-namespace Tryitter.Controllers;
+using Tryitter.Models;
+using Tryitter.Services;
 
 [Route("[controller]")]
 [ApiController]
@@ -17,13 +18,13 @@ public class UserController : ControllerBase
     _userUseCase = userUseCase;
   }
 
-  [HttpPost("/auth")]
+  [HttpPost("/Auth")]
   [AllowAnonymous]
-  public ActionResult<string> Authenticate([FromBody] AuthenticateRequest user)
+  public async Task<ActionResult<string>> Authenticate([FromBody] AuthenticateRequest user)
   {
     try
     {
-      var token = _userUseCase.Auth(user.Email, user.Password);
+      var token = await _userUseCase.Auth(user.Email, user.Password);
 
       if (token == null)
       { 
@@ -55,8 +56,8 @@ public class UserController : ControllerBase
   }
 
   [HttpGet]
-  [AllowAnonymous]
-  public async Task<ActionResult<List<User>>> GetAll()
+  [Authorize]
+  public async Task<ActionResult<List<User>>> GetAll() // TODO Criar ViewModel para retornar usuários sem a senha
   {
     try
     {
@@ -71,7 +72,7 @@ public class UserController : ControllerBase
   }
 
   [HttpGet("{id}")]
-  [AllowAnonymous]
+  [Authorize]
   public async Task<ActionResult<User>> GetById([FromRoute] string id)
   {
     try
@@ -94,7 +95,7 @@ public class UserController : ControllerBase
   }
 
   [HttpGet("Name/{name}")]
-  [AllowAnonymous]
+  [Authorize]
   public async Task<ActionResult<List<User>>> GetByName([FromRoute] string name)
   {
     try
@@ -110,13 +111,21 @@ public class UserController : ControllerBase
   }
 
   [HttpPut("{id}")]
-  [AllowAnonymous]
-  public async Task<ActionResult<User>> Update([FromRoute] string id, [FromBody] User newUser)
+  [Authorize]
+  public async Task<ActionResult<User>> Update([FromRoute] string id, [FromBody] UpdateRequest newUser)
   {
     try
     {
-      int IdNumber = Convert.ToInt32(id);
-      
+      var authorizationService = new AuthorizationService();
+      var isValidUser = authorizationService.VerifyIdentity(id, User);
+      if (!isValidUser)
+      {
+        return Unauthorized();
+      }
+
+
+      int IdNumber = Convert.ToInt32(id); // TODO Enviar para use case
+
       var user = await _userUseCase.Update(IdNumber, newUser);
 
       if (user is null)
@@ -133,12 +142,20 @@ public class UserController : ControllerBase
   }
 
   [HttpDelete("{id}")]
-  [AllowAnonymous]
+  [Authorize]
   public async Task<ActionResult> Delete([FromRoute] string id)
+
   {
     try
     {
-      int IdNumber = Convert.ToInt32(id);
+      var authorizationService = new AuthorizationService();
+      var isValidUser = authorizationService.VerifyIdentity(id, User);
+      if (!isValidUser)
+      {
+        return Unauthorized();
+      }
+
+      int IdNumber = Convert.ToInt32(id); // TODO Enviar para use case
       
       var user = await _userUseCase.Delete(IdNumber);
 

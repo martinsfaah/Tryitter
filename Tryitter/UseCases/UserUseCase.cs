@@ -1,19 +1,33 @@
-using Tryitter.Repositories;
-using Tryitter.Services;
-using Tryitter.Models;
 namespace Tryitter.UseCases;
+
+using BCrypt.Net;
+
+using Tryitter.Models;
+using Tryitter.Repositories;
+using Tryitter.RequestHandlers;
+using Tryitter.Services;
+
 public class UserUseCase : IUserUseCase
 {
-  private IUserRepository _repository;
+  private readonly IUserRepository _repository;
   public UserUseCase(IUserRepository repository)
+
   {
     _repository = repository;
   }
-  public string? Auth(string Email, string Password)
+
+  public async Task<string?> Auth(string Email, string Password)
   {
-    var user = _repository.GetByEmail(Email);
+    var user = await _repository.GetByEmail(Email);
     
-    if (user == null || user.Password != Password)
+    if (user == null)
+    {
+      return null;
+    }
+
+    var isPasswordValid = BCrypt.Verify(Password, user.Password);
+
+    if (!isPasswordValid)
     {
       return null;
     }
@@ -25,7 +39,12 @@ public class UserUseCase : IUserUseCase
   
   public async Task<User> Create(User user)
   {
+    var passwordHash = BCrypt.HashPassword(user.Password);
+
+    user.Password = passwordHash;
+
     var created = await _repository.Create(user);
+
 
     return created;
   }
@@ -44,6 +63,7 @@ public class UserUseCase : IUserUseCase
     return user;
   }
 
+
   public async Task<List<User>> GetByName(string name)
   {
     var user = await _repository.GetByName(name);
@@ -51,7 +71,7 @@ public class UserUseCase : IUserUseCase
     return user;
   }
 
-  public async Task<User?> Update(int id, User newUser)
+  public async Task<User?> Update(int id, UpdateRequest newUser)
   {
     var user = await _repository.GetById(id);
 
@@ -60,12 +80,10 @@ public class UserUseCase : IUserUseCase
       return null;
     }
 
-    user.Name = newUser.Name;
-    user.Username = newUser.Username;
-    user.Email = newUser.Email;
-    user.Password = newUser.Password;
-    user.Modulo = newUser.Modulo;
-    user.Status = newUser.Status;
+    user.Name = newUser.Name!;
+    user.Email = newUser.Email!;
+    user.Module = newUser.Module!;
+    user.Status = newUser.Status!;
 
     var updated = await _repository.Update(user);
 
