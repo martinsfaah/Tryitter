@@ -4,8 +4,8 @@ using BCrypt.Net;
 
 using Tryitter.Models;
 using Tryitter.Repositories;
-using Tryitter.RequestHandlers;
 using Tryitter.Services;
+using Tryitter.ViewModels.User;
 
 public class UserUseCase : IUserUseCase
 {
@@ -37,26 +37,34 @@ public class UserUseCase : IUserUseCase
     return token;
   }
   
-  public async Task<User> Create(User user)
+  public async Task<User> Create(CreateUserViewModel user)
   {
     var passwordHash = BCrypt.HashPassword(user.Password);
 
     user.Password = passwordHash;
 
-    var created = await _repository.Create(user);
+    var newUser = new User() {
+        Username = user.Username,
+        Email = user.Email,
+        Name = user.Name,
+        Password = user.Password,
+        Module = user.Module,
+        Status = user.Status
+    };
 
+    var created = await _repository.Create(newUser);
 
     return created;
   }
   
-  public async Task<List<User>> GetAll()
+  public async Task<List<ListUserViewModel>> GetAll()
   {
     var users = await _repository.GetAll();
 
     return users;
   }
 
-  public async Task<User?> GetById(int id)
+  public async Task<ListUserWithPostsViewModel?> GetById(int id)
   {
     var user = await _repository.GetById(id);
 
@@ -64,42 +72,44 @@ public class UserUseCase : IUserUseCase
   }
 
 
-  public async Task<List<User>> GetByName(string name)
+  public async Task<List<ListUserViewModel>> GetByName(string name)
   {
     var user = await _repository.GetByName(name);
 
     return user;
   }
 
-  public async Task<User?> Update(int id, UpdateRequest newUser)
+  public async Task<User?> Update(string id, UpdateUserViewModel userToUpdate)
   {
-    var user = await _repository.GetById(id);
-
-    if (user is null)
-    {
-      return null;
-    }
-
-    user.Name = newUser.Name!;
-    user.Email = newUser.Email!;
-    user.Module = newUser.Module!;
-    user.Status = newUser.Status!;
-
-    var updated = await _repository.Update(user);
+    var userId = Convert.ToInt32(id);
+    var updated = await _repository.Update(userId, userToUpdate);
 
     return updated;
   }
 
-  public async Task<User?> Delete(int id)
+  public async Task<User?> UpdateRole(string id, string role)
   {
-    var user = await _repository.GetById(id);
+    var userId = Convert.ToInt32(id);
 
-    if (user is null)
+    var updatedUser = await _repository.UpdateRole(userId, role);
+
+    if (updatedUser is null)
     {
       return null;
     }
+
+    return updatedUser;
+  }
+  public async Task<User?> Delete(string id)
+  {
+    var userId = Convert.ToInt32(id);
     
-    var deletedUser = await _repository.Delete(user);
+    var deletedUser = await _repository.Delete(userId);
+
+    if (deletedUser is null)
+    {
+      return null;
+    }
 
     return deletedUser;
   }

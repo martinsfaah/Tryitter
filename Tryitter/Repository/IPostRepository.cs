@@ -1,12 +1,13 @@
 using Tryitter.Models;
+using Tryitter.ViewModels.Post;
 
 namespace Tryitter.Repositories;
 
 public interface IPostRepository
 {
-  Task<Post> Create(Post post);
-  Task<List<Post>> GetAll();
-  Task<Post?> GetById(int id);
-  Task<Post> Update(Post post);
-  Task<Post> Delete(Post post);
+  Task<Post> Create(string Content, string ImageUrl, int userId);
+  Task<List<ListPostViewModel>> GetAll();
+  Task<ListPostViewModel?> GetById(int id);
+  Task<Post> Update(int postId, string content);
+  Task<Post> Delete(int postId);
 }
