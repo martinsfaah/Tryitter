@@ -1,13 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 
-<<<<<<< HEAD
 using Tryitter.Data;
 using Tryitter.Models;
 using Tryitter.ViewModels.Post;
 using Tryitter.ViewModels.User;
-=======
-using Tryitter.Models;
->>>>>>> 89d6a0bc1ef7860dc44d94f4ee43b90dd9692f93
 
 namespace Tryitter.Repositories;
 
@@ -29,7 +25,6 @@ public class UserRepository : IUserRepository
   
   public async Task<List<ListUserViewModel>> GetAll()
   {
-<<<<<<< HEAD
     var users = await _context.Users
       .AsNoTracking()
       .Select(x =>
@@ -45,9 +40,6 @@ public class UserRepository : IUserRepository
         }
       )
       .ToListAsync();
-=======
-    var users = await _context.Users.AsNoTracking().ToListAsync();
->>>>>>> 89d6a0bc1ef7860dc44d94f4ee43b90dd9692f93
 
 
     return users;
@@ -55,7 +47,6 @@ public class UserRepository : IUserRepository
 
   public async Task<ListUserWithPostsViewModel?> GetById(int id)
   {
-<<<<<<< HEAD
     var user = await _context.Users
       .AsNoTracking()
       .Include(x => x.Posts)
@@ -81,16 +72,12 @@ public class UserRepository : IUserRepository
         }
       )
       .FirstOrDefaultAsync(x => x.Id == id);
-=======
-    var user = await _context.Users.Include(x => x.Posts).FirstOrDefaultAsync(x => x.UserId == id);
->>>>>>> 89d6a0bc1ef7860dc44d94f4ee43b90dd9692f93
 
     return user;
   }
 
   public async Task<List<ListUserViewModel>> GetByName(string name)
   {
-<<<<<<< HEAD
     var user = await _context.Users
       .AsNoTracking()
       .Where(x => x.Name.Contains(name))
@@ -108,9 +95,6 @@ public class UserRepository : IUserRepository
         }
       )
       .ToListAsync();
-=======
-    var user = await _context.Users.AsNoTracking().Where(x => x.Name.Contains(name)).Include(x => x.Posts).ToListAsync();
->>>>>>> 89d6a0bc1ef7860dc44d94f4ee43b90dd9692f93
 
     return user;
   }
@@ -120,17 +104,9 @@ public class UserRepository : IUserRepository
     var userFound = await _context.Users.FirstOrDefaultAsync(x => x.UserId == userId);
     if (userFound is null)
     {
-<<<<<<< HEAD
       return null;
-=======
-      for (int i = 0; i < user.Posts.Count; i++)
-      {
-        _context.Remove(user.Posts.ToList()[i]); // ! Pode resolver com map
-      }
->>>>>>> 89d6a0bc1ef7860dc44d94f4ee43b90dd9692f93
     }
 
-<<<<<<< HEAD
     userFound.Name = userToUpdate.Name;
     userFound.Email = userToUpdate.Email;
     userFound.Module = userToUpdate.Module;
@@ -176,11 +152,5 @@ public class UserRepository : IUserRepository
   {
     return await _context.Users.AsNoTracking().FirstOrDefaultAsync(user => user.Email == Email);
   }
-=======
-  public async Task<User?> GetByEmail(string Email)
-  {
-    return await _context.Users.AsNoTracking().FirstOrDefaultAsync(user => user.Email == Email);
-  }
->>>>>>> 89d6a0bc1ef7860dc44d94f4ee43b90dd9692f93
 
 }
