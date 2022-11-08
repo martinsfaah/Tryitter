@@ -9,10 +9,14 @@ public class TestAuthenticationService {
     var sut = new AuthenticationService();
 
     var result = sut.GenerateToken(new User() {
-      Username = "johndoe",
-      Email = "johndoe@example.com",
-      Name = "John Doe"
+        UserId = 1,
+        Username = "johndoe",
+        Email = "johndoe@example.com",
+        Role = "User"
     });
+
+         
+
 
     result.Split(".").Length.Should().Be(3);
   }

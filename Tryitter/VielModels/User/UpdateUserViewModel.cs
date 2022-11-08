@@ -1,6 +1,6 @@
-namespace Tryitter.RequestHandlers;
+namespace Tryitter.ViewModels.User;
 
-public class UpdateRequest
+public class UpdateUserViewModel
 {
   public string? Email { get; set; }
   public string? Name { get; set; }

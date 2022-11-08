@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-
 using System.Text;
+
+using Tryitter.Data;
 using Tryitter.Models;
 using Tryitter.Repositories;
 using Tryitter.UseCases;
@@ -61,4 +62,37 @@ app.MapControllers();
 var context = new TryitterContext();
 context.Database.EnsureCreated();
 
+var adminEmail = Environment.GetEnvironmentVariable("SERVER_ADMIN_EMAIL");
+var adminPassword = Environment.GetEnvironmentVariable("SERVER_ADMIN_PASSWORD");
+if (adminEmail is null || adminPassword is null)
+{
+    adminEmail = "admin@example.com";
+    adminPassword = "admin123";
+}
+
+var userExists = context.Users.FirstOrDefault(x => x.Email == adminEmail);
+
+if (userExists is null)
+{
+    var passwordHash = BCrypt.Net.BCrypt.HashPassword(adminPassword);
+
+    if (adminEmail is null || adminPassword is null)
+    {
+        throw new Exception("Admin email or password not found");
+    }
+
+    context.Users.Add(new User() {
+        Username = "admin",
+        Email = adminEmail,
+        Name = "Administrador",
+        Password = passwordHash,
+        Role = "Admin",
+        Module = "",
+        Status = ""
+    });
+    context.SaveChanges();
+}
+
 app.Run();
+
+public partial class program {}

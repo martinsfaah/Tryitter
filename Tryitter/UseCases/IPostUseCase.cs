@@ -1,13 +1,13 @@
 using Tryitter.Models;
-using Tryitter.RequestHandlers;
+using Tryitter.ViewModels.Post;
 
 namespace Tryitter.UseCases;
 
 public interface IPostUseCase
 {
-  Task<Post?> Create(PostCreateRequest post, string userId);
-  Task<List<Post>> GetAll();
-  Task<Post?> GetById(string id);
+  Task<Post> Create(string Content, string ImageUrl, string userId);
+  Task<List<ListPostViewModel>> GetAll();
+  Task<ListPostViewModel?> GetById(string id);
   Task<Post?> Update(string id, string content);
-  Task Delete(Post post);
+  Task Delete(string id);
 }

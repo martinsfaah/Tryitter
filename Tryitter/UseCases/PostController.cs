@@ -5,8 +5,9 @@ using Microsoft.AspNetCore.Authorization;
 
 using Tryitter.UseCases;
 using Tryitter.Models;
-using Tryitter.RequestHandlers;
+using Tryitter.ViewModels.Post;
 using Tryitter.Services;
+using Tryitter.ViewModels.User;
 
 [Route("[controller]")]
 [ApiController]
@@ -20,20 +21,33 @@ public class PostController : ControllerBase
 
   [HttpPost]
   [Authorize]
-  public async Task<ActionResult<Post>> Create([FromBody] PostCreateRequest post)
+  public async Task<ActionResult<Post>> Create([FromBody] CreatePostViewModel model)
   {
     try
     {
       var userId = User.FindFirst("Id")!.Value;
 
-      var created = await _postUseCase.Create(post, userId);
+      string Content = model.Content;
+      string ImageUrl = model.ImageUrl;
+
+      var created = await _postUseCase.Create(Content, ImageUrl, userId);
 
       if (created is null)
       {
         return NotFound("User not found");
       }
 
-      return CreatedAtAction("GetById", new { id = created.PostId }, created);
+      return Created($"/Post/{created.PostId}", new ListPostViewModel() {
+        Id = created.PostId,
+        Content = created.Content,
+        ImageUrl = created.ImageUrl,
+        ContentType = created.ContentType,
+        User = new ShowUserViewModel() {
+          UserId = created.User.UserId,
+          Name = created.User.Name,
+          Username = created.User.Username
+        }
+      });
     }
     catch (Exception exception)
     {
@@ -80,7 +94,7 @@ public class PostController : ControllerBase
 
   [HttpPut("{id}")]
   [Authorize]
-  public async Task<ActionResult<Post>> Update([FromRoute] string id,[FromBody] UpdatePostRequest updatePostRequest)
+  public async Task<ActionResult<ListPostViewModel>> Update([FromRoute] string id,[FromBody] UpdatePostViewModel model)
   {
     try
     {
@@ -92,16 +106,17 @@ public class PostController : ControllerBase
       }
 
       var authorizationService = new AuthorizationService();
-      var isPostUserOrAdmin = authorizationService.VerifyIdentity(post.UserId.ToString(), User);
+      var isPostUserOrAdmin = authorizationService.VerifyIdentity(post.User.UserId.ToString(), User);
       if(!isPostUserOrAdmin)
       {
         return Unauthorized();
       }
 
+      await _postUseCase.Update(id, model.Content);
+      
+      var updatedPost = await _postUseCase.GetById(id);
 
-      var updatedPost = await _postUseCase.Update(id, updatePostRequest.content);
-
-      return Ok(post);
+      return Ok(updatedPost);
     }
     catch (Exception exception)
     {
@@ -122,13 +137,13 @@ public class PostController : ControllerBase
       }
       
       var authorizationService = new AuthorizationService();
-      var isPostUserOrAdmin = authorizationService.VerifyIdentity(post.UserId.ToString(), User);
+      var isPostUserOrAdmin = authorizationService.VerifyIdentity(post.User.UserId.ToString(), User);
       if(!isPostUserOrAdmin)
       {
         return Unauthorized();
       }
       
-      await _postUseCase.Delete(post);
+      await _postUseCase.Delete(id);
 
       return NoContent();
     }

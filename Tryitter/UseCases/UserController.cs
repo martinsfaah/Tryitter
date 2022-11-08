@@ -4,7 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 
 using Tryitter.UseCases;
-using Tryitter.RequestHandlers;
+using Tryitter.ViewModels;
+using Tryitter.ViewModels.User;
 using Tryitter.Models;
 using Tryitter.Services;
 
@@ -20,7 +21,7 @@ public class UserController : ControllerBase
 
   [HttpPost("/Auth")]
   [AllowAnonymous]
-  public async Task<ActionResult<string>> Authenticate([FromBody] AuthenticateRequest user)
+  public async Task<ActionResult<string>> Authenticate([FromBody] AuthenticateViewModel user)
   {
     try
     {
@@ -41,13 +42,21 @@ public class UserController : ControllerBase
 
   [HttpPost]
   [AllowAnonymous]
-  public async Task<ActionResult<User>> Create([FromBody] User user)
+  public async Task<ActionResult<User>> Create([FromBody] CreateUserViewModel user)
   {
     try
     {
       var created = await _userUseCase.Create(user);
 
-      return CreatedAtAction("GetById", new { id = created.UserId }, created);
+      return Created($"/User/{created.UserId}", new ListUserViewModel(){
+        Id = created.UserId,
+        Username = created.Username,
+        Email = created.Email,
+        Name = created.Name,
+        Role = created.Role,
+        Module = created.Module,
+        Status = created.Status
+      });
     }
     catch (Exception exception)
     {
@@ -57,7 +66,7 @@ public class UserController : ControllerBase
 
   [HttpGet]
   [Authorize]
-  public async Task<ActionResult<List<User>>> GetAll() // TODO Criar ViewModel para retornar usuários sem a senha
+  public async Task<ActionResult<List<User>>> GetAll()
   {
     try
     {
@@ -73,7 +82,7 @@ public class UserController : ControllerBase
 
   [HttpGet("{id}")]
   [Authorize]
-  public async Task<ActionResult<User>> GetById([FromRoute] string id)
+  public async Task<ActionResult<ListUserWithPostsViewModel>> GetById([FromRoute] string id)
   {
     try
     {
@@ -96,7 +105,7 @@ public class UserController : ControllerBase
 
   [HttpGet("Name/{name}")]
   [Authorize]
-  public async Task<ActionResult<List<User>>> GetByName([FromRoute] string name)
+  public async Task<ActionResult<List<ListUserViewModel>>> GetByName([FromRoute] string name)
   {
     try
     {
@@ -112,7 +121,7 @@ public class UserController : ControllerBase
 
   [HttpPut("{id}")]
   [Authorize]
-  public async Task<ActionResult<User>> Update([FromRoute] string id, [FromBody] UpdateRequest newUser)
+  public async Task<ActionResult<ListUserViewModel>> Update([FromRoute] string id, [FromBody] UpdateUserViewModel userToUpdate)
   {
     try
     {
@@ -124,21 +133,55 @@ public class UserController : ControllerBase
       }
 
 
-      int IdNumber = Convert.ToInt32(id); // TODO Enviar para use case
-
-      var user = await _userUseCase.Update(IdNumber, newUser);
+      var user = await _userUseCase.Update(id, userToUpdate);
 
       if (user is null)
       {
         return NotFound("User not found");
       }
 
-      return Ok(user);
+      return Ok(new ListUserViewModel() {
+        Id = user.UserId,
+        Username = user.Username,
+        Email = user.Email,
+        Name = user.Name,
+        Role = user.Role,
+        Module = user.Module,
+        Status = user.Status
+      });
     }
     catch (Exception exception)
     {
       return BadRequest(exception.Message);
     }
+  }
+
+  [HttpPut("{id}/Role")]
+  [Authorize]
+  public async Task<ActionResult<ListUserViewModel>> UpdateRole([FromRoute] string id, [FromBody] string role)
+  {
+      if (!User.IsInRole("Admin"))
+      {
+        return Unauthorized();
+      }
+
+      var userUpdated = await _userUseCase.UpdateRole(id, role);
+
+      if (userUpdated is null)
+      {
+        return NotFound("User not found");
+      }
+
+      return Ok(new ListUserViewModel() {
+        Id = userUpdated.UserId,
+        Username = userUpdated.Username,
+        Email = userUpdated.Email,
+        Name = userUpdated.Name,
+        Role = userUpdated.Role,
+        Module = userUpdated.Module,
+        Status = userUpdated.Status
+      });
+
   }
 
   [HttpDelete("{id}")]
@@ -154,10 +197,8 @@ public class UserController : ControllerBase
       {
         return Unauthorized();
       }
-
-      int IdNumber = Convert.ToInt32(id); // TODO Enviar para use case
       
-      var user = await _userUseCase.Delete(IdNumber);
+      var user = await _userUseCase.Delete(id);
 
       if (user is null)
       {

@@ -1,21 +1,67 @@
-using Tryitter.Repositories;
-using Tryitter.Services;
-using Tryitter.Models;
-using Tryitter.RequestHandlers;
 namespace Tryitter.UseCases;
+
+using Tryitter.Repositories;
+using Tryitter.Models;
+using Tryitter.ViewModels.Post;
+
 public class PostUseCase : IPostUseCase
 {
   private readonly IPostRepository _repository;
-  private readonly IUserRepository _userRepository;
-  public PostUseCase(IPostRepository repository, IUserRepository userRepository)
+  public PostUseCase(IPostRepository repository)
   {
     _repository = repository;
-    _userRepository = userRepository;
   }
   
-  public async Task<Post?> Create(PostCreateRequest post, string userId)
+  public async Task<Post> Create(string Content, string ImageUrl, string userId)
   {
-    // ? Virá convertido do frontend
+    var createdPost = await _repository.Create(Content, ImageUrl, Convert.ToInt32(userId));
+
+    if (createdPost is null)
+    {
+      return null;
+    }
+
+    return createdPost;
+  }
+  
+  public async Task<List<ListPostViewModel>> GetAll()
+  {
+    var posts = await _repository.GetAll();
+
+    return posts;
+  }
+
+  public async Task<ListPostViewModel?> GetById(string id)
+  {
+    int postId = Convert.ToInt32(id);
+    var post = await _repository.GetById(postId);
+
+    return post;
+  }
+
+  public async Task<Post?> Update(string id, string content)
+  {
+    int postId = Convert.ToInt32(id);
+
+    var updated = await _repository.Update(postId, content);
+
+    if (updated is null)
+    {
+      return null;
+    }
+
+    return updated;
+  }
+
+  public async Task Delete(string id)
+  {  
+    int postId = Convert.ToInt32(id);
+    await _repository.Delete(postId);
+  }
+}
+
+// ? Virá convertido do frontend
+    // Create
     // List<byte[]> data = new(); // TODO Se der tempo verificar sobre cloud storage
     //   if (post.ImageUrl is not null)
     //   {
@@ -31,51 +77,3 @@ public class PostUseCase : IPostUseCase
     //     }
     //   }
     // ? ------------------------------
-    var newPost = new Post()
-      {
-        Content = post.Content,
-        ImageUrl = post.ImageUrl,
-        UserId = Convert.ToInt32(userId),
-      };
-    
-    var created = await _repository.Create(newPost);
-
-    return created;
-  }
-  
-  public async Task<List<Post>> GetAll()
-  {
-    var posts = await _repository.GetAll();
-
-    return posts;
-  }
-
-  public async Task<Post?> GetById(string id)
-  {
-    int postId = Convert.ToInt32(id);
-    var post = await _repository.GetById(postId);
-
-    return post;
-  }
-
-  public async Task<Post?> Update(string id, string content)
-  {
-    int postId = Convert.ToInt32(id);
-
-    var post = await _repository.GetById(postId);
-    if (post is null)
-    {
-      return null;
-    }
-
-    post.Content = content;
-    var updated = await _repository.Update(post);
-
-    return updated;
-  }
-
-  public async Task Delete(Post post)
-  {    
-    await _repository.Delete(post);
-  }
-}

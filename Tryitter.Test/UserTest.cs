@@ -3,9 +3,14 @@ using Newtonsoft.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
-using Tryitter.Repositories;
+using Tryitter.Data;
 using Tryitter.Models;
 using Microsoft.Extensions.DependencyInjection;
+using Tryitter.ViewModels.User;
+using Tryitter.ViewModels.Post;
+using Tryitter.ViewModels;
+using System.Net.Http.Headers;
+
 namespace Tryitter.Test;
 
 public class UserTest : IClassFixture<WebApplicationFactory<program>>
@@ -31,10 +36,12 @@ public class UserTest : IClassFixture<WebApplicationFactory<program>>
                 using (var scope = sp.CreateScope())
                 using (var appContext = scope.ServiceProvider.GetRequiredService<TryitterContext>())
                 {
+                    var passwordHash = BCrypt.Net.BCrypt.HashPassword("Test");
+
                     appContext.Database.EnsureCreated();
                     appContext.Database.EnsureDeleted();
                     appContext.Database.EnsureCreated();
-                    appContext.Users.Add(new User { UserId = 1, Username = "Test", Name="Test", Password="Test", Email = "Test", Modulo = "Test", Status = "Test" });
+                    appContext.Users.Add(new User { Username = "Test", Name="Test", Password=passwordHash, Email = "Test", Role = "Admin",Module = "Test", Status = "Test" });
                     appContext.SaveChanges();
                 }
             });
@@ -49,53 +56,66 @@ public class UserTest : IClassFixture<WebApplicationFactory<program>>
         var body = new StringContent(json, Encoding.UTF8, "application/json"); 
         var response =  await client.PostAsync("/User", body);
         var content = await response.Content.ReadAsStringAsync();
-        var result = JsonConvert.DeserializeObject<User>(content);
+        var result = JsonConvert.DeserializeObject<ListUserViewModel>(content);
+
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.Created);
         result.Name.Should().Be(userExpected.Name);
         result.Username.Should().Be(userExpected.Username);
         result.Email.Should().Be(userExpected.Email);
-        result.Password.Should().Be(userExpected.Password);
-        result.Modulo.Should().Be(userExpected.Modulo);
+        result.Module.Should().Be(userExpected.Module);
         result.Status.Should().Be(userExpected.Status);
-        result.UserId.Should().Be(2);
+        result.Id.Should().Be(2);
     }
 
     public static readonly TheoryData<User> ShouldCreateAUserData = new()
     {
         new User()
         {
+            UserId = 2,
             Username = "user",
-            Name = "name",
             Email = "email@email.com",
-            Password = "password123",
-            Modulo = "Front-End",
+            Name = "name",
+            Password = "Password12!",
+            Role = "User",
+            Module = "Front-End",
             Status = "Ativo"
         }
     };
 
     [Theory(DisplayName = "GET /User deve retornar uma lista de users")]
     [MemberData(nameof(ShouldGetAllUsersData))]
-    public async Task ShouldGetAllUsers(List<User> usersExpected)
+    public async Task ShouldGetAllUsers(List<ListUserViewModel> usersExpected)
     {
+        var user = new AuthenticateViewModel() {
+            Email = "Test",
+            Password = "Test"
+        };
+        var json = JsonConvert.SerializeObject(user);
+        var body = new StringContent(json, Encoding.UTF8, "application/json");
+
+        var token = await client.PostAsync("/Auth", body);
+        var responseToken = await token.Content.ReadAsStringAsync();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", responseToken);
+
         var response =  await client.GetAsync("/User");
         var content = await response.Content.ReadAsStringAsync();
-        var result = JsonConvert.DeserializeObject<List<User>>(content);
+        var result = JsonConvert.DeserializeObject<List<ListUserViewModel>>(content);
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
         result.Should().BeEquivalentTo(usersExpected);
     }
 
-    public static readonly TheoryData<List<User>> ShouldGetAllUsersData = new()
+    public static readonly TheoryData<List<ListUserViewModel>> ShouldGetAllUsersData = new()
     {
         new()
         {
-            new User 
+            new ListUserViewModel 
             { 
-              UserId = 1,
+              Id = 1,
               Username = "Test",
-              Name="Test",
-              Password="Test",
               Email = "Test",
-              Modulo = "Test",
+              Name="Test",
+              Role = "Admin",
+              Module = "Test",
               Status = "Test"
             }
         }
@@ -103,32 +123,58 @@ public class UserTest : IClassFixture<WebApplicationFactory<program>>
 
     [Theory(DisplayName = "GET /User/{id} deve retornar um user")]
     [MemberData(nameof(ShouldGetUserbyIdData))]
-    public async Task ShouldGetUserbyId(User userExpected)
+    public async Task ShouldGetUserbyId(ListUserWithPostsViewModel userExpected)
     {
+        var user = new AuthenticateViewModel() {
+            Email = "Test",
+            Password = "Test"
+        };
+        var json = JsonConvert.SerializeObject(user);
+        var body = new StringContent(json, Encoding.UTF8, "application/json");
+
+        var token = await client.PostAsync("/Auth", body);
+        var responseToken = await token.Content.ReadAsStringAsync();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", responseToken);
+
         var response =  await client.GetAsync("/User/1");
         var content = await response.Content.ReadAsStringAsync();
-        var result = JsonConvert.DeserializeObject<User>(content);
+        var result = JsonConvert.DeserializeObject<ListUserWithPostsViewModel>(content);
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
         result.Should().BeEquivalentTo(userExpected);
     }
 
-    public static readonly TheoryData<User> ShouldGetUserbyIdData = new()
+    public static readonly TheoryData<ListUserWithPostsViewModel> ShouldGetUserbyIdData = new()
     {
-        new User 
+        new ListUserWithPostsViewModel 
         { 
-            UserId = 1,
+            Id = 1,
             Username = "Test",
-            Name="Test",
-            Password="Test",
             Email = "Test",
-            Modulo = "Test",
-            Status = "Test"
+            Name= "Test",
+            Role = "Admin",
+            Module = "Test",
+            Status = "Test",
+            Posts = new List<ShowPostViewModel>()
+            {
+                
+            }
         }
     };
 
     [Fact(DisplayName = "GET /User/{id} com id inválido deve retornar not found")]
     public async Task ShouldGetUserInvalid()
     {
+        var user = new AuthenticateViewModel() {
+            Email = "Test",
+            Password = "Test"
+        };
+        var json = JsonConvert.SerializeObject(user);
+        var body = new StringContent(json, Encoding.UTF8, "application/json");
+
+        var token = await client.PostAsync("/Auth", body);
+        var responseToken = await token.Content.ReadAsStringAsync();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", responseToken);
+
         var response =  await client.GetAsync("/User/2");
         var content = await response.Content.ReadAsStringAsync();
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
@@ -137,63 +183,105 @@ public class UserTest : IClassFixture<WebApplicationFactory<program>>
 
     [Theory(DisplayName = "GET /User/Name/{name} deve retornar uma lista de users")]
     [MemberData(nameof(ShouldGetUserbyNameData))]
-    public async Task ShouldGetUserbyName(List<User> usersExpected)
+    public async Task ShouldGetUserbyName(List<ListUserViewModel> usersExpected)
     {
+        var user = new AuthenticateViewModel() {
+            Email = "Test",
+            Password = "Test"
+        };
+        var json = JsonConvert.SerializeObject(user);
+        var body = new StringContent(json, Encoding.UTF8, "application/json");
+
+        var token = await client.PostAsync("/Auth", body);
+        var responseToken = await token.Content.ReadAsStringAsync();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", responseToken);
+
         var response =  await client.GetAsync("/User/Name/Test");
         var content = await response.Content.ReadAsStringAsync();
-        var result = JsonConvert.DeserializeObject<List<User>>(content);
+        var result = JsonConvert.DeserializeObject<List<ListUserViewModel>>(content);
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
         result.Should().BeEquivalentTo(usersExpected);
     }
 
-    public static readonly TheoryData<List<User>> ShouldGetUserbyNameData = new()
+    public static readonly TheoryData<List<ListUserViewModel>> ShouldGetUserbyNameData = new()
     {
         new()
         {
-            new User 
+            new ListUserViewModel 
             { 
-              UserId = 1,
-              Username = "Test",
-              Name="Test",
-              Password="Test",
-              Email = "Test",
-              Modulo = "Test",
-              Status = "Test"
+                Id = 1,
+                Username = "Test",
+                Email = "Test",
+                Name= "Test",
+                Role = "Admin",
+                Module = "Test",
+                Status = "Test",
             }
         }
     };
 
     [Theory(DisplayName = "UPDATE /User/{id} deve retornar um user")]
     [MemberData(nameof(ShouldUpdateUserData))]
-    public async Task ShouldUpdateUser(User userExpected)
+    public async Task ShouldUpdateUser(UpdateUserViewModel userSent, ListUserViewModel userExpected)
     {
-        var json = JsonConvert.SerializeObject(userExpected);
+        var user = new AuthenticateViewModel() {
+            Email = "Test",
+            Password = "Test"
+        };
+        var jsonToken = JsonConvert.SerializeObject(user);
+        var bodyToken = new StringContent(jsonToken, Encoding.UTF8, "application/json");
+
+        var token = await client.PostAsync("/Auth", bodyToken);
+        var responseToken = await token.Content.ReadAsStringAsync();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", responseToken);
+
+        var json = JsonConvert.SerializeObject(userSent);
         var body = new StringContent(json, Encoding.UTF8, "application/json"); 
         var response =  await client.PutAsync("/User/1", body);
         var content = await response.Content.ReadAsStringAsync();
-        var result = JsonConvert.DeserializeObject<User>(content);
+        var result = JsonConvert.DeserializeObject<ListUserViewModel>(content);
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
         result.Should().BeEquivalentTo(userExpected);
     }
 
-    public static readonly TheoryData<User> ShouldUpdateUserData = new()
+    public static readonly TheoryData<UpdateUserViewModel, ListUserViewModel> ShouldUpdateUserData = new()
     {
-        new User 
-        { 
-            UserId = 1,
-            Username = "newTest",
-            Name="newTest",
-            Password="newTest",
-            Email = "newTest",
-            Modulo = "newTest",
-            Status = "newTest"
+        {
+            new UpdateUserViewModel
+            {
+                Email = "Test",
+                Name = "Test",
+                Module = "newTest",
+                Status = "newTest"
+            },
+            new ListUserViewModel 
+            { 
+                Id = 1,
+                Username = "Test",
+                Email = "Test",
+                Name="Test",
+                Role = "Admin",
+                Module = "newTest",
+                Status = "newTest"
+            }
         }
     };
 
     [Theory(DisplayName = "UPDATE /User/{id} com id inválido deve retornar not found")]
     [MemberData(nameof(ShouldUpdateUserInvalidData))]
-    public async Task ShouldUpdateUserInvalid( User userExpected)
+    public async Task ShouldUpdateUserInvalid( UpdateUserViewModel userExpected)
     {
+        var user = new AuthenticateViewModel() {
+            Email = "Test",
+            Password = "Test"
+        };
+        var jsonToken = JsonConvert.SerializeObject(user);
+        var bodyToken = new StringContent(jsonToken, Encoding.UTF8, "application/json");
+
+        var token = await client.PostAsync("/Auth", bodyToken);
+        var responseToken = await token.Content.ReadAsStringAsync();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", responseToken);
+
         var json = JsonConvert.SerializeObject(userExpected);
         var body = new StringContent(json, Encoding.UTF8, "application/json");
         var response =  await client.PutAsync("/User/2", body);
@@ -201,16 +289,13 @@ public class UserTest : IClassFixture<WebApplicationFactory<program>>
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
         content.Should().BeEquivalentTo("User not found");
     }
-    public static readonly TheoryData<User> ShouldUpdateUserInvalidData = new()
+    public static readonly TheoryData<UpdateUserViewModel> ShouldUpdateUserInvalidData = new()
     {
-        new User 
+        new UpdateUserViewModel 
         { 
-            UserId = 1,
-            Username = "newTest",
-            Name="newTest",
-            Password="newTest",
             Email = "newTest",
-            Modulo = "newTest",
+            Name="newTest",
+            Module = "newTest",
             Status = "newTest"
         }
     };
@@ -218,6 +303,17 @@ public class UserTest : IClassFixture<WebApplicationFactory<program>>
     [Fact(DisplayName = "DELETE /User/{id} deve apagar um user")]
     public async Task ShouldDeleteUserbyId()
     {
+        var user = new AuthenticateViewModel() {
+            Email = "Test",
+            Password = "Test"
+        };
+        var json = JsonConvert.SerializeObject(user);
+        var body = new StringContent(json, Encoding.UTF8, "application/json");
+
+        var token = await client.PostAsync("/Auth", body);
+        var responseToken = await token.Content.ReadAsStringAsync();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", responseToken);
+
         var resp =  await client.DeleteAsync("/User/1");
         resp.StatusCode.Should().Be(System.Net.HttpStatusCode.NoContent);
         var response =  await client.GetAsync("/User/1");
@@ -229,6 +325,17 @@ public class UserTest : IClassFixture<WebApplicationFactory<program>>
     [Fact(DisplayName = "DELETE /User/{id} com id inválido deve retornar not found")]
     public async Task ShouldDeleteUserInvalid()
     {
+        var user = new AuthenticateViewModel() {
+            Email = "Test",
+            Password = "Test"
+        };
+        var json = JsonConvert.SerializeObject(user);
+        var body = new StringContent(json, Encoding.UTF8, "application/json");
+
+        var token = await client.PostAsync("/Auth", body);
+        var responseToken = await token.Content.ReadAsStringAsync();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", responseToken);
+
         var response =  await client.DeleteAsync("/User/2");
         var content = await response.Content.ReadAsStringAsync();
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
