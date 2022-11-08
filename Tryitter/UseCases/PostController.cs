@@ -152,26 +152,4 @@ public class PostController : ControllerBase
       return BadRequest(exception.Message);
     }
   }
-
-  // ? Se vir do front não precisa retornar convertido
-  // [HttpGet("Image/{id}")]
-  // [Authorize]
-  // public async Task<ActionResult> GetImage([FromRoute] string id)
-  // {
-  //   try
-  //   {
-  //     var post = await _postUseCase.GetById(id);
-
-  //     if (post is null)
-  //     {
-  //       return NotFound("Post not found");
-  //     }
-
-  //     return File(post.ImageUrl, post.ContentType);
-  //   }
-  //   catch (Exception exception)
-  //   {
-  //     return BadRequest(exception.Message);
-  //   }
-  // }
 }

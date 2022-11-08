@@ -59,21 +59,3 @@ public class PostUseCase : IPostUseCase
     await _repository.Delete(postId);
   }
 }
-
-// ? Virá convertido do frontend
-    // Create
-    // List<byte[]> data = new(); // TODO Se der tempo verificar sobre cloud storage
-    //   if (post.ImageUrl is not null)
-    //   {
-    //     if (post.ImageUrl.Length > 0)
-    //     {
-    //       using (var stream = new MemoryStream())
-    //       {
-    //         await post.ImageUrl.CopyToAsync(stream);
-
-    //         data.Add(stream.ToArray());
-    //       }
-
-    //     }
-    //   }
-    // ? ------------------------------
