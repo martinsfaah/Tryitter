@@ -54,6 +54,7 @@ public class UserUseCase : IUserUseCase
 
     var created = await _repository.Create(newUser);
 
+
     return created;
   }
   

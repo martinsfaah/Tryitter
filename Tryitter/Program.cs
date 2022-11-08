@@ -32,7 +32,6 @@ builder.Services.AddAuthentication(x =>
 });
 
 builder.Services.AddControllers();
-
 builder.Services.AddDbContext<TryitterContext>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserUseCase, UserUseCase>();
